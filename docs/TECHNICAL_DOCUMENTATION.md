@@ -237,9 +237,18 @@ nx build web
 
 ## Deployment
 
+### CI/CD Pipeline
+
+Thoth uses GitHub Actions for its CI/CD pipeline, which automates the following processes:
+
+- **Code Quality Checks**: Linting and type checking on every push
+- **Unit Tests**: Running tests for all packages
+- **Build Verification**: Ensuring all applications build successfully
+- **Deployment**: Automatically deploying to development and production environments
+
 ### Web Application
 
-The web application can be deployed to any static hosting service, such as Vercel, Netlify, or Firebase Hosting.
+The web application is deployed to Vercel for both development and production environments.
 
 ### Mobile Application
 
