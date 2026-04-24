@@ -205,9 +205,68 @@ data class DreamEntity(
 
 ---
 
-### Phase 3: Google Play Release (Days 9–10)
+### Phase 3: GitHub Release (Days 9–10)
 
-#### 3.1 Release Signing Configuration
+> **Repo Purpose**: This repository provides open-source code and GitHub Release binaries. No Vercel or production deployment is involved.
+
+#### 3.1 CI/CD Overview
+
+```
+PR / push to main/develop
+└── ci.yml                     → lint + type-check + test  (quality gate only)
+
+git tag v1.0.0 && git push --tags
+└── release.yml
+    ├── ci (lint + test)       → must pass before any build
+    ├── build-debug             → assembleDebug APK
+    └── release                 → softprops/action-gh-release → GitHub Release + APK attached
+```
+
+#### 3.2 Release Workflow
+
+```bash
+# 1. Tag a version
+git tag v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+
+# 2. GitHub Actions pipeline runs automatically:
+#    ci.yml (lint + type-check + test)
+#        ↓ pass
+#    release.yml (build debug APK)
+#        ↓
+#    softprops/action-gh-release → GitHub Release with APK attached
+
+# 3. Download APK from the Release page
+#    Users install via: adb install thoth-debug.apk
+```
+
+#### 3.3 Required GitHub Secrets
+
+Configure these in **Settings → Secrets and variables → Actions**:
+
+| Secret | Purpose |
+|--------|---------|
+| `VITE_FIREBASE_API_KEY` | Firebase API key |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
+| `VITE_FIREBASE_PROJECT_ID` | Firebase project ID |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
+| `VITE_FIREBASE_APP_ID` | Firebase app ID |
+| `VITE_GEMINI_API_KEY` | Gemini AI API key |
+| `VITE_R2_PUBLIC_URL` | Cloudflare R2 public URL |
+
+#### 3.4 Release Signing (for signed AAB)
+
+Release AAB (Google Play ready) requires signing secrets — configure when ready:
+
+| Secret | Purpose |
+|--------|---------|
+| `ANDROID_KEYSTORE_BASE64` | Keystore file as base64 string |
+| `ANDROID_KEY_ALIAS` | Key alias name |
+| `ANDROID_KEY_PASSWORD` | Key password |
+| `ANDROID_STORE_PASSWORD` | Keystore password |
+
+#### 3.5 Release APK/AAB Artifacts
 ```bash
 # Generate signing key
 keytool -genkey -v -keystore thoth-release.jks \

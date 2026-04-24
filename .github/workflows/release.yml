@@ -1,0 +1,196 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip CI tests (faster, use for hotfixes)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  # ── Quality gate ────────────────────────────────────────────
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Test
+        if: github.event.inputs.skip_tests != 'true'
+        run: npm test
+
+  # ── Build Debug APK ─────────────────────────────────────────
+  build-debug:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_R2_PUBLIC_URL: ${{ secrets.VITE_R2_PUBLIC_URL }}
+
+      - name: Sync Capacitor assets
+        run: npx cap sync android
+
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+
+      - name: Build Debug APK
+        run: cd android && ./gradlew assembleDebug --no-daemon
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: thoth-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
+  # ── Build Release AAB (requires signing secrets) ─────────────
+  build-release:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: false  # Enable when signing secrets are configured (see below)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_R2_PUBLIC_URL: ${{ secrets.VITE_R2_PUBLIC_URL }}
+
+      - name: Sync Capacitor assets
+        run: npx cap sync android
+
+      - name: Make Gradle executable
+        run: chmod +x android/gradlew
+
+      # ── Uncomment when ANDROID_KEYSTORE_BASE64 secret is set ──
+      # - name: Decode keystore
+      #   run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/thoth.jks
+      #
+      # - name: Build Release AAB
+      #   run: cd android && ./gradlew bundleRelease --no-daemon
+      #   env:
+      #     KEYSTORE_FILE: thoth.jks
+      #     KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      #     KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      #     STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+      #
+      # - name: Upload Release AAB
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: thoth-release-aab
+      #     path: android/app/build/outputs/bundle/release/app-release.aab
+      #     retention-days: 30
+
+  # ── Create GitHub Release ───────────────────────────────────
+  release:
+    needs: [ci, build-debug]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download Debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: thoth-debug-apk
+          path: .
+
+      - name: Download Release AAB
+        uses: actions/download-artifact@v4
+        if: false  # Enable when build-release job is uncommented
+        with:
+          name: thoth-release-aab
+          path: .
+        continue-on-error: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref }}
+          name: Thoth ${{ github.ref }}
+          body: |
+            ## Download
+
+            **Thoth Android (Debug APK)**
+
+            Install on your Android device:
+            ```
+            adb install thoth-debug.apk
+            ```
+
+            > Debug builds require "Install from unknown sources" enabled on your device.
+
+            ---
+            Built from: `{{ github.sha }}`
+            Triggered by: `${{ github.actor }}`
+          draft: false
+          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') }}
+          files: |
+            thoth-debug.apk
+            # app-release.aab  # Enable when signing is configured
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
