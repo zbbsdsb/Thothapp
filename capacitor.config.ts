@@ -4,6 +4,11 @@ const config: CapacitorConfig = {
   appId: 'com.thoth.dreamarchive',
   appName: 'Thoth',
   webDir: 'dist',
+  ios: {
+    contentInset: 'automatic',
+    backgroundColor: '#0a0a0f',
+    allowsLinkPreview: false,
+  },
   android: {
     // Allow mixed content (R2 HTTP upload fallback)
     allowMixedContent: true,
