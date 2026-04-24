@@ -428,54 +428,45 @@ export default config;
 - `npx cap add android` succeeded, `android/` directory generated
 - `npx cap sync android` succeeded, web assets synced to `android/app/src/main/assets/public`
 - `AndroidManifest.xml` permissions configured (recording, notifications, biometrics, location, background service)
-- `res/values/styles.xml` dark theme configured (upgraded to Material3)
+- `res/values/styles.xml` dark theme configured (Material3)
 - `res/values/colors.xml` created (dark background #0a0a0f, purple accent #c084fc)
 - `gradle-wrapper.properties` networkTimeout set to 300000ms
-- `buildFeatures { buildConfig = true }` added to `app/build.gradle`
-- Release build minification enabled (`minifyEnabled = true`, `shrinkResources = true`)
-- `capacitor.config.ts` comments translated to English
+- `app/build.gradle` optimized: `buildConfig = true`, release minify + shrinkResources, debug buildType
+- CI/CD restructured:
+  - `ci.yml` — lint + type-check + test on every PR/push (quality gate only)
+  - `release.yml` — tag push triggers: CI gate → assembleDebug → GitHub Release with APK attached
+  - Deleted: `deploy-dev.yml`, `deploy-prod.yml`, `build.yml` (not needed — repo is source code + Release distribution)
 
-⚠️ **Blockers**
-- Android SDK not installed (must be installed via Android Studio)
-- Gradle 8.14.3-all.zip download timed out (slow network, wrapper has 2-minute hard limit)
+⚠️ **Blockers (user action required)**
+- GitHub Secrets not configured — CI will fail until `VITE_*` secrets are added in repo Settings
+- Firebase `google-services.json` not placed in `android/app/` — required for APK to connect to Firebase
+- Android SDK not installed locally (for local development/build) — install Android Studio
 
 ## Quick Start Commands
 
 ```bash
 cd Thothapp
 
-# Step 1: Install Capacitor (already done — for reinstall)
+# ── Local development ────────────────────────────────────────
+npm run dev              # Start web dev server
+
+# ── Android local build ──────────────────────────────────────
+# Requires: Android Studio installed
+npx cap open android    # Open Android Studio with project
+# In Android Studio: Sync → Run 'app' on device/emulator
+
+# ── Trigger GitHub Release ───────────────────────────────────
+# Requires: GitHub Secrets configured (see §3.3)
+git tag v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+# GitHub Actions runs: ci → build-debug → Release created automatically
+
+# ── Reinitialize Capacitor (if needed) ───────────────────────
 npm install @capacitor/core @capacitor/cli
-npm install @capacitor/android \
-  @capacitor/app \
-  @capacitor/haptics \
-  @capacitor/local-notifications \
-  @capacitor/splash-screen \
-  @capacitor/status-bar
-
-# Step 2: Initialize (for re-init)
-npx cap init Thoth com.thoth.dreamarchive --web-dir=dist
-
-# Step 3: Add Android (for re-add)
 npx cap add android
-
-# Step 4: Install Android Studio (required)
-# Download: https://developer.android.com/studio
-# After install, open Thothapp/android/ directory and wait for Gradle Sync
-
-# Step 5: Place Firebase config
-# Download google-services.json from Firebase Console
-# Place at android/app/google-services.json
-
-# Step 6: Build and sync
-npm run build
-npx cap sync android
-
-# Step 7: Run in Android Studio
-npx cap open android
-# Android Studio: Sync Project → Run 'app'
+npm run build && npx cap sync android
 ```
 
 ---
 
-*Document version: v1.1.0 | Last updated: 2026-04-23*
+*Document version: v1.2.0 | Last updated: 2026-04-24*
