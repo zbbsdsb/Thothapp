@@ -26,6 +26,23 @@ Dreams are the "atomic imagery" of our inner worlds. Thoth treats every dream as
 - **Global Imagery Map**: Visualize the distribution of dreams across the globe in real-time.
 - **Trending Atomic Symbols**: See which symbols and themes are currently resonating in the collective subconscious.
 
+## 🏗️ Architecture
+
+Thoth uses a modern Monorepo architecture to support multiple platforms while maintaining a single source of truth for core business logic.
+
+### Platforms
+- **Web**: React 19 with Vite
+- **Mobile**: React Native
+- **Windows**: Electron
+- **WearOS**: Android Wear
+- **Apple Watch**: WatchKit
+
+### Core Services
+- **AI Service**: Dream analysis and audio transcription using Google Gemini
+- **Data Service**: Data storage and retrieval using Firebase Firestore
+- **Auth Service**: User authentication using Firebase Auth
+- **Storage Service**: File storage using Cloudflare R2 and Firebase Storage
+
 ## 🛠️ Getting Started
 
 1. **Initiate Connection**: Sign in with your Google account to create your private, encrypted archive.
@@ -33,5 +50,18 @@ Dreams are the "atomic imagery" of our inner worlds. Thoth treats every dream as
 3. **Consult the Oracle**: Review the AI-generated insights and your unique Divine Oracle sentence.
 4. **Explore the Atlas**: Search your history to find recurring patterns and archetypes.
 
+## 📚 Documentation
+
+For more detailed information, please refer to the following documentation:
+
+- **ARCHITECTURE.md**: Technical architecture documentation
+- **FEATURES.md**: Detailed feature documentation
+- **API.md**: API and service documentation
+- **PROJECT_STRUCTURE.md**: Monorepo structure documentation
+- **TECHNICAL_DOCUMENTATION.md**: Comprehensive technical documentation
+- **PRIVACY.md**: Privacy and security information
+- **QUOTA.md**: Usage and quota information
+- **dreambase.md**: Information about the dreambase infrastructure
+
 ---
-*Thoth v1.0.8 — Powered by dreambase. The archive is waiting.*
+*Thoth v2.0.0 — Powered by dreambase. The archive is waiting.*
