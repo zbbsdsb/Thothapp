@@ -10,6 +10,8 @@ import {
   doc,
   updateDoc,
   limit,
+  serverTimestamp,
+  increment,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { handleFirestoreError } from '../lib/errors';
@@ -86,7 +88,7 @@ export function useDreamActions(userId: string | undefined, profile: UserProfile
       if (!userId) return;
       try {
         await deleteDoc(doc(db, 'dreams', dreamId));
-        await updateDoc(doc(db, 'users', userId), { total_dreams: -1 });
+        await updateDoc(doc(db, 'users', userId), { total_dreams: increment(-1) });
         await updateGlobalLocation(location || 'Unknown', -1);
         if (tags.length > 0) await updateGlobalImagery(tags, -1);
       } catch (err) {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Mic,
+  Mic2,
   MicOff,
   Keyboard,
   ArrowRight,

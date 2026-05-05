@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
 import { uploadAudio, buildAudioFileName, audioToBase64 } from '../lib/storage';
 import { transcribeAudio, analyzeDream } from '../lib/ai';
-import type { UserProfile } from '../types';
+import type { UserProfile, Dream } from '../types';
 
 interface UseRecordingOptions {
   userId: string | undefined;
@@ -11,6 +11,7 @@ interface UseRecordingOptions {
   hasUserKey: boolean;
   onDreamAdded?: () => void;
   onRecordingStart?: () => void;
+  addDream?: (fields: Omit<Dream, 'id' | 'user_id' | 'created_at'>) => Promise<string>;
 }
 
 export function useRecording({
@@ -20,6 +21,7 @@ export function useRecording({
   hasUserKey,
   onDreamAdded,
   onRecordingStart,
+  addDream,
 }: UseRecordingOptions) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -87,10 +89,18 @@ export function useRecording({
         const transcript = await transcribeAudio(apiKey, base64Audio, mimeType);
         const { tags, insight, divine_oracle } = await analyzeDream(apiKey, transcript);
 
-        // Build and return the dream object — actual Firestore write is handled by useDreamActions
-        onDreamAdded?.();
+        if (addDream) {
+          await addDream({
+            transcript,
+            audio_url: audioUrl,
+            tags,
+            insight,
+            divine_oracle,
+            location: userCountry || 'Unknown',
+          });
+        }
 
-        void audioUrl, transcript, tags, insight, divine_oracle; // consumed via returned object
+        onDreamAdded?.();
         toast.success('Dream archived successfully.');
       } catch (err) {
         if (err instanceof Error && !err.message.includes('Firestore Error')) {
@@ -100,7 +110,7 @@ export function useRecording({
         setIsTranscribing(false);
       }
     },
-    [userId, profile, hasUserKey, onDreamAdded]
+    [userId, profile, hasUserKey, onDreamAdded, addDream, userCountry]
   );
 
   return {

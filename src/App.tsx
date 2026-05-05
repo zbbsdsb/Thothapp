@@ -4,7 +4,7 @@ import { Clock, Moon } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 
 import { useAuth } from './hooks/useAuth';
-import { useDreams } from './hooks/useDreams';
+import { useDreams, useDreamActions } from './hooks/useDreams';
 import { useRecording } from './hooks/useRecording';
 import { useCountdown } from './hooks/useCountdown';
 
@@ -17,8 +17,6 @@ import { SettingsView } from './components/SettingsView';
 import { DreamDetailModal } from './components/DreamDetailModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 
-import { updateDoc, doc } from 'firebase/firestore';
-import { db } from './firebase';
 import type { Dream } from './types';
 
 type Tab = 'record' | 'history' | 'global' | 'settings';
@@ -26,6 +24,7 @@ type Tab = 'record' | 'history' | 'global' | 'settings';
 export default function App() {
   const { user, profile, loading } = useAuth();
   const { dreams } = useDreams(user?.uid);
+  const { deleteDream, addDream } = useDreamActions(user?.uid, profile);
 
   const [activeTab, setActiveTab] = useState<Tab>('record');
   const [selectedDream, setSelectedDream] = useState<Dream | null>(null);
@@ -57,13 +56,14 @@ export default function App() {
     userCountry,
     hasUserKey: !!profile?.external_apis?.minimax,
     onDreamAdded: () => {},
+    addDream,
   });
 
   // Delete confirmation
   const handleDeleteConfirm = async () => {
     if (!dreamToDelete || !user) return;
     try {
-      await updateDoc(doc(db, 'users', user.uid), { total_dreams: -1 });
+      await deleteDream(dreamToDelete.id, dreamToDelete.location, dreamToDelete.tags);
       toast.success('Dream deleted successfully.');
     } catch {
       toast.error('Failed to delete dream.');
