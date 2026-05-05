@@ -1,0 +1,49 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    namespace = "com.thoth.dreamarchive.wear"
+    compileSdk rootProject.ext.wearCompileSdkVersion
+
+    defaultConfig {
+        applicationId "com.thoth.dreamarchive.wear"
+        minSdk rootProject.ext.wearMinSdkVersion
+        targetSdk rootProject.ext.wearTargetSdkVersion
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildFeatures {
+        buildConfig true
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion rootProject.ext.kotlinVersion
+    }
+
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    // Wear Compose BOM
+    implementation platform("androidx.wear.compose:compose-bom:${rootProject.ext.wearComposeBomVersion}")
+    implementation "androidx.wear.compose:compose-material3"
+    implementation "androidx.wear.compose:compose-navigation"
+
+    // Wear Activity
+    implementation 'androidx.activity:activity-compose:1.8.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.7.0'
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
+
+    // Shared common module
+    implementation project(':common')
+}
