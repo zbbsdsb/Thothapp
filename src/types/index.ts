@@ -81,3 +81,29 @@ export interface DreamAnalysis {
   insight: string;
   divine_oracle: string;
 }
+
+// ── Payment (WeChat Pay) ─────────────────────────────────────
+
+export type PaymentStatus = 'pending' | 'success' | 'failed' | 'cancelled';
+
+export interface CreateOrderParams {
+  amount: number;       // Amount in CNY *cents* (100 = ¥1.00)
+  title: string;       // Order title shown to user
+  outTradeNo: string;  // Client-generated unique order ID
+  attach?: string;     // Optional metadata (e.g. user_id)
+}
+
+export interface CreateOrderResponse {
+  prepayId: string;
+  nonceStr: string;
+  timestamp: string;
+  sign: string;
+  outTradeNo: string;
+}
+
+export interface PaymentResult {
+  tradeState: PaymentStatus;
+  transactionId?: string;
+  tradeStateDesc?: string;
+  outTradeNo: string;
+}

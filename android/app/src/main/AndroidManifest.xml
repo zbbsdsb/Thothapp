@@ -33,6 +33,19 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- WeChat Pay callback receiver (required by WeChat SDK) -->
+        <activity
+            android:name=".WXEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <!-- WeChat SDK calls this via: package.wxapi.WXEntryActivity -->
+            </intent-filter>
+        </activity>
     </application>
 
     <!-- Permissions -->

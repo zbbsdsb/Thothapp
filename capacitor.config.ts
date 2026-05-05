@@ -31,6 +31,10 @@ const config: CapacitorConfig = {
       backgroundColor: '#0a0a0f',
       overlaysWebView: false,
     },
+    // Custom URL scheme for WeChat Pay callback routing
+    App: {
+      launchUri: 'thoth://',
+    },
   },
 };
 
