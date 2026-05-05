@@ -11,7 +11,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useDreams, useDreamActions } from '../hooks/useDreams';
+import { useDreamActions } from '../hooks/useDreams';
 import { analyzeDream } from '../lib/ai';
 import type { UserProfile } from '../types';
 
