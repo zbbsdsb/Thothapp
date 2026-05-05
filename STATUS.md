@@ -64,6 +64,8 @@ Thoth is a cross-platform AI dream journal that captures voice recordings of dre
 - [ ] WearOS companion app
 - [ ] Background recording service (Android)
 
+> 📋 For detailed next steps and product roadmap, see [`planning/NEXT_STEPS.md`](planning/NEXT_STEPS.md) and [`planning/ROADMAP.md`](planning/ROADMAP.md).
+
 ---
 
-*This is a living document. For detailed architecture and API docs, see `docs/`.*
+*This is a living document. For detailed architecture and API docs, see `docs/`. For team handoff, see [`HANDOFF.md`](HANDOFF.md).*

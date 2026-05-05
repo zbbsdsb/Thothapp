@@ -165,9 +165,11 @@ thoth/
 | `docs/PRIVACY.md` | **Legal/Users** | Data storage, AI processing, security |
 | `docs/QUOTA.md` | **Users** | Daily limits, personal API key setup |
 | `docs/dreambase.md` | **Product** | Infrastructure concept ("atomic imagery") |
-| `docs/CHANGELOG.md` | **Everyone** | Version history (needs update — still shows Nx) |
+| `CHANGELOG.md` | **Everyone** | Version history (rewritten May 5, 2026 — Nx refs removed) |
+| `planning/NEXT_STEPS.md` | **Everyone** | Post-device-migration setup checklist |
+| `planning/ROADMAP.md` | **Everyone** | Product roadmap (v2.1 → v3.1) |
 
-> **⚠️ Warning**: `TECHNICAL_DOCUMENTATION.md` and `CHANGELOG.md` still reference Nx monorepo structure. They are outdated. Trust `PROJECT_STRUCTURE.md` (v2.0.0) instead.
+> **⚠️ Warning**: `TECHNICAL_DOCUMENTATION.md` still references Nx monorepo structure. It is outdated. Trust `PROJECT_STRUCTURE.md` (v2.0.0) instead.
 
 ---
 
@@ -268,9 +270,10 @@ The release keystore (`android/app/thoth-upload-key.jks`) is committed for conve
 
 ## 9. Next Steps for the Team
 
+> 📋 **Full details**: See `planning/NEXT_STEPS.md` for post-migration checklist and `planning/ROADMAP.md` for product roadmap.
+
 ### Immediate (This Sprint)
 
-- [ ] **Update `CHANGELOG.md`** — still shows Nx structure, needs rewrite
 - [ ] **Update `TECHNICAL_DOCUMENTATION.md`** — remove Nx references
 - [ ] **Test on real Android device** — emulator works, need real device validation
 - [ ] **iOS: first successful build** — scaffold exists, needs Xcode work
