@@ -1,4 +1,4 @@
-import React from 'react';
+ import React from 'react';
 import { motion } from 'motion/react';
 
 export const ThothLogo = ({ className = "w-12 h-12" }: { className?: string }) => {
