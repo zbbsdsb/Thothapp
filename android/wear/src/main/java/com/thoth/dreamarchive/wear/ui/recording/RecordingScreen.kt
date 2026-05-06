@@ -7,17 +7,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.Text
 import com.thoth.dreamarchive.wear.theme.WearTheme
 
 @Composable
@@ -37,13 +35,13 @@ fun RecordingScreen(
                     onClick = { /* TODO: Start recording */ },
                     modifier = Modifier.size(80.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = WearTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Mic,
-                        contentDescription = "Record",
-                        modifier = Modifier.size(40.dp)
+                    Text(
+                        text = "●",
+                        fontSize = 32.sp,
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -52,7 +50,7 @@ fun RecordingScreen(
                 Text(
                     text = "Tap to Record",
                     fontSize = 14.sp,
-                    color = WearTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }

@@ -19,10 +19,12 @@ ext {
     wearMinSdkVersion = 30
     wearCompileSdkVersion = 34
     wearTargetSdkVersion = 34
-    wearComposeBomVersion = '2024.02.00'
+    // WearOS Compose versions (no separate BOM, use explicit versions in wear/build.gradle)
 
     // Kotlin
-    kotlinVersion = '2.1.20'
+    kotlinVersion = '1.9.24'
+    // Kotlin Compose compiler extension version (must match Kotlin 1.9.24)
+    composeKotlinCompilerVersion = '1.5.14'
 
     // Firebase BoM
     firebaseBomVersion = '32.7.2'

@@ -21,7 +21,16 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion rootProject.ext.kotlinVersion
+        kotlinCompilerExtensionVersion rootProject.ext.composeKotlinCompilerVersion
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
     packagingOptions {
@@ -32,10 +41,10 @@ android {
 }
 
 dependencies {
-    // Wear Compose BOM
-    implementation platform("androidx.wear.compose:compose-bom:${rootProject.ext.wearComposeBomVersion}")
-    implementation "androidx.wear.compose:compose-material3"
-    implementation "androidx.wear.compose:compose-navigation"
+    // Wear Compose (no separate BOM - use explicit versions)
+    implementation "androidx.wear.compose:compose-material3:1.0.0-alpha23"
+    implementation "androidx.wear.compose:compose-navigation:1.3.1"
+    implementation "androidx.wear.compose:compose-foundation:1.3.1"
 
     // Wear Activity
     implementation 'androidx.activity:activity-compose:1.8.2'
