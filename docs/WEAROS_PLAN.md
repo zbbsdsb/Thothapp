@@ -291,13 +291,13 @@ BoxWithConstraints {
 
 ## Development Phases
 
-### Phase W0: Scaffold (1 day)
+### Phase W0: Scaffold ✅ COMPLETE (May 6, 2026 — commit `edc004c`)
 
-- [ ] Add `common/` module with shared Firebase models
-- [ ] Add `wear/` module with Compose setup
-- [ ] Configure Gradle multi-module (`settings.gradle`, `variables.gradle`)
-- [ ] Set up WearOS theme (dark, matching Thoth brand `#0a0a0f`)
-- [ ] Verify empty shell builds: `.\gradlew.bat :wear:assembleDebug`
+- [x] Add `common/` module with shared Firebase models
+- [x] Add `wear/` module with Compose setup
+- [x] Configure Gradle multi-module (`settings.gradle`, `variables.gradle`)
+- [x] Set up WearOS theme (dark, matching Thoth brand `#0a0a0f`)
+- [x] Verify empty shell builds: `.\gradlew.bat :wear:assembleDebug` → `wear-debug.apk` (30 MB)
 
 ### Phase W1: Recording (1-2 days)
 
@@ -374,16 +374,48 @@ buildscript {
 
 ---
 
-## Differences from v1.0.0 of This Plan
+## Build Environment Notes (Windows, Phase W0)
 
-This version (v2.0.0) updates the original plan to match the **actual project conventions**:
+The plan was designed for standard Android Studio setups, but Phase W0 was built without Android Studio. Key deviations:
 
-1. **Groovy DSL** (not Kotlin DSL `.gradle.kts`) — matches existing project files
-2. **`variables.gradle`** centralized version management — matches existing pattern
-3. **`google-services.json` handling** — existing phone app doesn't use it; WearOS `common/` module will need it
-4. **Kotlin Gradle Plugin** — needs to be added to root `build.gradle` `buildscript`
-5. **` Wear Compose BOM** version specified explicitly in `variables.gradle`
+| Item | Plan | Actual (as-built) |
+|------|------|-------------------|
+| Android SDK path | `C:\Users\...\AppData\Local\Android\Sdk` | `F:\Android\Sdk` |
+| JDK | System JDK | JDK 17 (Temurin) at `F:\Android\jdk17\jdk-17.0.14+7` |
+| `gradle.properties` extra key | — | `org.gradle.java.home=F:\\Android\\jdk17\\jdk-17.0.14+7` |
+| Wear Compose BOM | `androidx.wear.compose:compose-bom` | **Does not exist** — use explicit versions (see below) |
+| `variables.gradle` Kotlin | `kotlinVersion = '2.0.21'` | `kotlinVersion = '1.9.24'` (JDK 17 constraint) |
+
+### Correct WearOS Compose dependency versions (no BOM)
+
+```groovy
+// wear/build.gradle — replace BOM block with:
+implementation 'androidx.wear.compose:compose-material3:1.0.0-alpha23'
+implementation 'androidx.wear.compose:compose-navigation:1.3.1'
+implementation 'androidx.wear.compose:compose-foundation:1.3.1'
+```
+
+### Things that differ from plan docs
+
+1. **`common/build.gradle`** — do NOT apply `com.google.gms.google-services` plugin (library modules not allowed)
+2. **JVM target** — both `:common` and `:wear` need `compileOptions { sourceCompatibility/targetCompatibility JavaVersion.VERSION_17 }` + `kotlinOptions { jvmTarget = '17' }`
+3. **Color values** — `ColorScheme` params expect `Color` objects, not raw hex `Long`; wrap with `Color(0xFF...)`
+4. **Wear `Text`** — import from `androidx.wear.compose.material3`, not `androidx.compose.material3`
 
 ---
 
-*Document version: v2.0.0 | Updated: 2026-05-05 | Aligned with Groovy DSL project convention*
+## Differences from v2.0.0 of This Plan
+
+This version (v2.1.0) adds Phase W0 completion status and real build-environment notes from the Windows (non-Android Studio) build run on May 6, 2026. Corrections vs v2.0.0:
+
+1. `wearComposeBomVersion` variable removed — BOM does not exist; replaced with explicit artifact versions
+2. `kotlinVersion` corrected to `1.9.24` (v2.0.0 had `2.0.21`, which requires JDK 21+)
+3. `common/build.gradle` — `google-services` plugin removed (library module restriction documented)
+4. Added `compileOptions`/`kotlinOptions` blocks to both `:common` and `:wear` (JVM 17)
+5. Added `Build Environment Notes` section for non-standard Windows SDK paths
+
+**v2.0.0 context** (still valid): Groovy DSL, `variables.gradle` centralized versions, Kotlin Gradle Plugin added to root `buildscript`, `google-services.json` needed by `common/` module.
+
+---
+
+*Document version: v2.1.0 | Updated: 2026-05-06 | Phase W0 complete — wear-debug.apk builds (30 MB)*

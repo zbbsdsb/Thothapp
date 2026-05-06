@@ -1,6 +1,6 @@
 # Thoth — Project Status
 
-> Last updated: May 5, 2026
+> Last updated: May 6, 2026
 
 ## What is Thoth?
 
@@ -21,7 +21,7 @@ Thoth is a cross-platform AI dream journal that captures voice recordings of dre
 | Memory Collapse Countdown | ✅ Working | 180s timer with dissolve animation. |
 | Android APK Build | ✅ Working | Capacitor 8, signed with upload keystore, Play-ready. |
 | iOS Build | ⚠️ Scaffold | Capacitor shell generated, not yet built/tested. |
-| WearOS | 📋 Planned | Plan documented, not started. |
+| WearOS | 🚧 In Progress | Phase W0 complete: `wear/` + `common/` modules build successfully (`wear-debug.apk` 30 MB). Phase W1 (recording) next. |
 | Push Notifications | 📋 Planned | FCM integration not yet implemented. |
 | Offline Cache | 📋 Planned | No Room/SQLite cache yet. |
 
@@ -61,7 +61,7 @@ Thoth is a cross-platform AI dream journal that captures voice recordings of dre
 - [ ] Code splitting to reduce initial bundle size
 - [ ] Push notifications for Memory Collapse reminders
 - [ ] iOS build verification and TestFlight
-- [ ] WearOS companion app
+- [x] WearOS companion app — Phase W0 scaffold complete; Phase W1 (voice recording) in progress
 - [ ] Background recording service (Android)
 
 > 📋 For detailed next steps and product roadmap, see [`planning/NEXT_STEPS.md`](planning/NEXT_STEPS.md) and [`planning/ROADMAP.md`](planning/ROADMAP.md).

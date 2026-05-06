@@ -1,6 +1,6 @@
 # Internal Handoff — Thoth Project
 
-> **Last updated**: May 5, 2026
+> **Last updated**: May 6, 2026
 > **Author**: cao zhe (caozhe@caozhe.com)
 > **Repo**: `caozhe/ThothApp` (GitHub)
 > **Project type**: Capacitor cross-platform app (Android/iOS) + React Web, backed by Firebase
@@ -41,8 +41,8 @@ thoth/
 │   │   │   └── res/      # Icons, splash, themes
 │   │   ├── capacitor.build.gradle
 │   │   └── keystore.properties  # .gitignored — release signing
-│   ├── wear/               # [PLANNED] WearOS module
-│   ├── common/             # [PLANNED] Shared Kotlin module
+│   ├── wear/               # [W0 COMPLETE] WearOS app module — scaffold builds (wear-debug.apk)
+│   ├── common/             # [W0 COMPLETE] Shared Kotlin module (Firebase, Dream model)
 │   ├── build.gradle        # Root Gradle (plugins, dependencies)
 │   ├── variables.gradle    # SDK versions (compileSdk=36, minSdk=24, targetSdk=36)
 │   └── .gitignore         # Blocks keystore + google-services.json
@@ -80,7 +80,28 @@ thoth/
 
 ---
 
-## 4. Recent Fixes (May 5, 2026)
+## 4. Recent Fixes (May 5–6, 2026)
+
+### Commits `5b4d4ca` + `edc004c` — WearOS Phase W0 Scaffold (May 6, 2026)
+
+| # | Work | Detail |
+|---|------|--------|
+| W0-1 | Created `android/wear/` module | Groovy DSL, Compose for Wear, MVVM skeleton |
+| W0-2 | Created `android/common/` module | Shared Kotlin library — FirebaseRepository, Dream model, ServiceLocator |
+| W0-3 | Wired Gradle multi-module | `:wear` + `:common` in `settings.gradle` |
+| W0-4 | Fixed JDK version mismatch | System JDK 25 → Kotlin unsupported; JDK 17 (Temurin) installed to `F:\Android\jdk17`; path set via `org.gradle.java.home` in `gradle.properties` |
+| W0-5 | Fixed WearOS Compose deps | `androidx.wear.compose:compose-bom` does not exist; switched to explicit versions (`compose-material3:1.0.0-alpha23`, `compose-navigation:1.3.1`, `compose-foundation:1.3.1`) |
+| W0-6 | Fixed `:common` module | Removed `google-services` plugin (not allowed on library modules); added `compileOptions`/`kotlinOptions` for JVM 17 |
+| W0-7 | Fixed Kotlin source errors | `WearTheme.kt` hex colors wrapped in `Color()`; `Text` imports use `androidx.wear.compose.material3` |
+
+**Result**: `.\gradlew.bat :wear:assembleDebug` succeeds → `wear-debug.apk` (30 MB)
+
+**Build environment** (Windows, non-standard SDK location):
+```
+Android SDK:  F:\Android\Sdk
+JDK 17:       F:\Android\jdk17\jdk-17.0.14+7
+gradle.properties: org.gradle.java.home=F:\\Android\\jdk17\\jdk-17.0.14+7
+```
 
 ### Commit `aa6f9fc` — Critical Bug Fixes (7 issues)
 
@@ -134,13 +155,13 @@ thoth/
 | Feature | Status | Notes |
 |---------|--------|-------|
 | iOS | Scaffold exists (`ios/` dir) | Needs Xcode signing + real device test |
+| WearOS | **Phase W0 complete** — `wear-debug.apk` builds | Phase W1 (voice recording screen + Firebase upload) is next |
 | Push Notifications | Not started | Plan: FCM for Android, APNs for iOS |
 | Background Recording | Not started | Needs Android Foreground Service |
 | Offline Cache | Not started | No Room/SQLite yet |
 
 ### ❌ Not Started
 
-- WearOS companion app (`android/wear/`)
 - iOS TestFlight / App Store release
 - Biometric unlock
 - Social features (dream sharing)
@@ -278,6 +299,8 @@ The release keystore (`android/app/thoth-upload-key.jks`) is committed for conve
 - [ ] **Test on real Android device** — emulator works, need real device validation
 - [ ] **iOS: first successful build** — scaffold exists, needs Xcode work
 - [ ] **Add code splitting** — bundle is ~1.3MB JS (Firebase + D3), should be split
+- [x] **WearOS Phase W0** — `wear/` + `common/` modules build successfully (`wear-debug.apk` 30 MB) ✅
+- [ ] **WearOS Phase W1** — implement voice recording screen + Firebase upload in `:wear` module
 
 ### Next Sprint
 
@@ -288,7 +311,8 @@ The release keystore (`android/app/thoth-upload-key.jks`) is committed for conve
 
 ### Future
 
-- [ ] **WearOS module** — `android/wear/`, see `WEAROS_PLAN.md`
+- [ ] **WearOS Phase W2** — dream list screen (last 5 dreams from Firestore)
+- [ ] **WearOS Phase W3** — polish, upload progress, CI release step
 - [ ] **iOS TestFlight** — `IOS_PLAN.md` Phase i2/i3
 - [ ] **Consolidate `packages/common`** — remove duplicate logic in `src/lib/`
 - [ ] **Offline cache** — Room (Android) / CoreData (iOS)

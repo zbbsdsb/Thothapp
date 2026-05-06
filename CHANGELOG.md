@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `STATUS.md` — public-facing project status document
 - `HANDOFF.md` — internal team handoff documentation
+- **WearOS Phase W0** — `android/wear/` and `android/common/` modules scaffolded and building
+  - `wear/` module: Jetpack Compose for Wear, MVVM skeleton (MainWearActivity, RecordingScreen, DreamListScreen, WearTheme)
+  - `common/` module: shared Kotlin library (FirebaseRepository, Dream model, ServiceLocator, Config)
+  - Gradle multi-module wiring: `:wear` and `:common` included in `settings.gradle`
+  - `wear-debug.apk` builds successfully (30 MB) — commit `edc004c`
 
 ### Fixed
 - **Critical**: `useRecording.ts` now calls `addDream()` to persist voice-recorded dreams (previously discarded all data)
@@ -25,11 +30,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Medium**: `server.ts` — CORS restricted to whitelist, R2 presign now validates fileName and contentType
 - **Medium**: `storage.ts` — platform-aware routing (web → R2 first, mobile → Firebase Storage directly)
 - **Medium**: Removed unused imports (`serverTimestamp` in `useAuth.ts`, `useDreams` in `RecordView.tsx`)
+- **WearOS build** — resolved 6 consecutive Gradle/Kotlin errors (see `edc004c` commit message for full details):
+  - Kotlin version pinned to `1.9.24` in `variables.gradle` (system JDK 25 forced JDK 17 workaround)
+  - `org.gradle.java.home` set to JDK 17 in `gradle.properties`
+  - WearOS Compose BOM does not exist; replaced with explicit artifact versions
+  - Removed `google-services` plugin from `:common` (not allowed on library modules)
+  - Fixed `WearTheme.kt` color params and `Text` import in all Wear screens
 
 ### Changed
 - `ANDROID_PLAN.md` — completed Phase 0, updated to v1.2.0
 - `PROJECT_STRUCTURE.md` — rewritten to reflect actual npm workspaces (not Nx), v2.0.0
-- `WEAROS_PLAN.md` — updated Gradle config examples to Groovy DSL (matching actual project)
+- `WEAROS_PLAN.md` — updated Gradle config examples to Groovy DSL (matching actual project); Phase W0 marked complete
 
 ---
 
