@@ -2,168 +2,149 @@
 
 > Items required before a production build or release can run end-to-end.
 > Organized by urgency: **Blocker** → **High** → **Medium** → **Nice-to-Have**.
+>
+> **Current Setup**: Web frontend deployed on **Vercel** (Firebase already connected ✅). GitHub Actions only builds Android/iOS APKs/IPAs.
 
 ---
 
-## Blocker — App Will Not Build / Run Without These
+## Blocker — App Build Will Fail Without These
 
 ### 1. Firebase Configuration
 
-| Item | File | Status | Action |
-|------|------|--------|--------|
-| Dedicated Firebase project | — | ❌ Missing | Create at [console.firebase.google.com](https://console.firebase.google.com) |
-| `firebase-applet-config.json` | `firebase-applet-config.json` | ⚠️ Placeholder | Replace with real project config (projectId, appId, apiKey, authDomain, storageBucket, messagingSenderId) |
-| Firestore database | — | ⚠️ Using shared demo DB | Create a dedicated Firestore database in your Firebase project |
-| Firestore security rules | `firestore.rules` | ⚠️ Deployed | Deploy: `firebase deploy --only firestore:rules` |
-| Storage security rules | `storage.rules` | ⚠️ Deployed | Deploy: `firebase deploy --only storage:rules` |
-| Google Auth provider | Firebase Console | ❌ Not enabled | Enable **Google** in Firebase Console → Authentication → Sign-in method |
-| Apple Sign-In (iOS) | Firebase Console | ❌ Not enabled | Enable **Apple** if targeting iOS |
-| Anonymous Auth | Firebase Console | ❌ Not enabled | Enable **Anonymous** (used for WearOS fallback) |
+| Item | Status | Where |
+|------|--------|-------|
+| Firebase project | ✅ Configured (Vercel) | [console.firebase.google.com](https://console.firebase.google.com) |
+| `firebase-applet-config.json` | ⚠️ Placeholder | Replace with real project config |
+| Firestore database | ✅ Created | Firebase Console |
+| Google Auth | ✅ Enabled | Firebase Console → Authentication |
+| Anonymous Auth | ✅ Enabled | Firebase Console → Authentication |
 
-### 2. Firebase Android — `google-services.json`
+> **Note**: Web/Vercel already works. Android/iOS builds need `google-services.json` / `GoogleService-Info.plist` locally.
 
-| Item | File | Where |
-|------|------|-------|
-| `google-services.json` | `android/app/google-services.json` | Firebase Console → Project Settings → Your apps → Android → Download `google-services.json` |
-
-> Without this file, the Android APK will crash on startup (Firebase cannot initialize).
-
-### 3. Firebase iOS — `GoogleService-Info.plist`
+### 2. Firebase Android — `google-services.json` ⚠️ **NEEDED**
 
 | Item | File | Where |
 |------|------|-------|
-| `GoogleService-Info.plist` | `ios/App/App/GoogleService-Info.plist` | Firebase Console → Project Settings → Your apps → iOS → Download |
+| `google-services.json` | `android/app/google-services.json` | Firebase Console → Project Settings → Android App → Download |
 
-> Without this file, iOS build will fail to link Firebase.
+> Without this file, Android APK will crash on startup (Firebase cannot initialize).
+
+### 3. Firebase iOS — `GoogleService-Info.plist` ⚠️ **NEEDED (when Mac available)**
+
+| Item | File | Where |
+|------|------|-------|
+| `GoogleService-Info.plist` | `ios/App/App/GoogleService-Info.plist` | Firebase Console → Project Settings → iOS App → Download |
 
 ### 4. Gemini API Key
 
-| Item | Env Var | Where to Get |
-|------|---------|-------------|
-| Gemini API Key | `VITE_GEMINI_API_KEY` | [makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey) |
+| Item | Status | Where |
+|------|--------|-------|
+| Gemini API Key | ✅ Set in Vercel | [ai.google.dev](https://ai.google.dev) |
 
-> Used client-side. Currently prompted from user input. In production, move to server-side proxy.
+> Already configured in Vercel Dashboard. For local dev, add to `.env`: `VITE_GEMINI_API_KEY=...`
 
 ---
 
-## High — Build Will Succeed But Core Features Will Fail
+## High — Core Features Will Fail Without These
 
 ### 5. R2 Storage (Audio Upload)
 
-| Item | Env Var | Where to Get |
-|------|---------|-------------|
-| R2 Account ID | `R2_ACCOUNT_ID` (backend) | Cloudflare Dashboard → R2 Overview |
-| R2 Access Key ID | `R2_ACCESS_KEY_ID` (backend) | R2 → Manage R2 API Tokens → Create Token |
-| R2 Secret Access Key | `R2_SECRET_ACCESS_KEY` (backend) | Same token creation step |
-| R2 Bucket Name | `R2_BUCKET_NAME` (backend) | Cloudflare Dashboard → R2 → Create bucket |
-| R2 Public URL | `R2_PUBLIC_URL` (backend) + `VITE_R2_PUBLIC_URL` (frontend) | R2 bucket → Settings → Public access |
-| R2 Custom Domain (optional) | — | Cloudflare → R2 → Custom Domains |
-
-> **Fallback**: If R2 fails, `uploadAudio()` in `src/lib/storage.ts` falls back to Firebase Storage automatically.
-
-### 6. WeChat Pay — App Payment
-
-#### Backend (server environment variables)
+> **Web**: Handled by Vercel (dev server + R2 presign). 
+> **Android/iOS**: Use Firebase Storage fallback (already implemented in `src/lib/storage.ts`).
 
 | Item | Env Var | Where to Get |
 |------|---------|-------------|
-| Merchant ID | `WX_MCHID` | WeChat Pay Merchant Platform |
-| APIv3 Serial Number | `WX_SERIAL_NO` | WeChat Pay → APIv3 Key & Certificates |
-| APIv3 Private Key File | `WX_PRIVATE_KEY_PATH` | Download from WeChat Pay, store securely |
-| APIv3 AES Key (32 chars) | `WX_APIV3_KEY` | WeChat Pay Merchant Platform |
-| WeChat App ID | `WX_APP_ID` | WeChat Open Platform → Mobile App |
-| Payment Server Base URL | `PAYMENT_SERVER_BASE_URL` | Your deployed backend domain |
-| Payment Server URL (frontend) | `VITE_PAYMENT_SERVER_URL` | Same as above, for frontend |
+| R2 Account ID | `R2_ACCOUNT_ID` | Cloudflare Dashboard → R2 |
+| R2 Access Key ID | `R2_ACCESS_KEY_ID` | R2 → Manage API Tokens |
+| R2 Secret Access Key | `R2_SECRET_ACCESS_KEY` | Same step |
+| R2 Bucket Name | `R2_BUCKET_NAME` | Cloudflare Dashboard → R2 |
+| R2 Public URL | `R2_PUBLIC_URL` + `VITE_R2_PUBLIC_URL` | R2 bucket → Settings |
 
-#### Frontend
+### 6. WeChat Pay — App Payment (Merchant Mode)
+
+#### Backend (for payment server)
+
+| Item | Env Var | Where to Get |
+|------|---------|-------------|
+| Merchant ID | `WX_MCHID` | [pay.weixin.qq.com](https://pay.weixin.qq.com) |
+| APIv3 Serial Number | `WX_SERIAL_NO` | WeChat Pay → APIv3 Certificates |
+| APIv3 Private Key | `WX_PRIVATE_KEY_PATH` | Download from WeChat Pay |
+| APIv3 AES Key | `WX_APIV3_KEY` | WeChat Pay Merchant Platform |
+| WeChat App ID | `WX_APP_ID` | [open.weixin.qq.com](https://open.weixin.qq.com) |
+
+#### Frontend (already coded in `src/lib/payment.ts`)
 
 | Item | Env Var | Where |
 |------|---------|-------|
-| WeChat App ID (frontend) | `VITE_WX_APP_ID` | Same as `WX_APP_ID` |
+| WeChat App ID | `VITE_WX_APP_ID` | Same as `WX_APP_ID` |
+| Payment Server URL | `VITE_PAYMENT_SERVER_URL` | Your backend domain |
 
-#### Android — WXEntryActivity
-
-| Item | File | Status |
-|------|------|--------|
-| `WXEntryActivity.java` | `android/app/src/.../wxapi/WXEntryActivity.java` | ✅ Created |
-| `AndroidManifest.xml` (WXEntryActivity) | `android/app/src/main/AndroidManifest.xml` | ✅ Registered |
-| `thoth://` URL scheme | `capacitor.config.ts` | ✅ Configured |
-
-#### WeChat Open Platform Registration
+#### WeChat Open Platform
 
 | Item | Requirement |
 |------|------------|
-| WeChat Open Platform account | [open.weixin.qq.com](https://open.weixin.qq.com) |
-| Register mobile app | Applications → Mobile App → Fill in bundle ID + app name |
-| App ID (wx...) | From the registered app |
-| App Secret | From the registered app (keep secret) |
+| Open Platform account | [open.weixin.qq.com](https://open.weixin.qq.com) |
+| Register mobile app | Applications → Mobile App → Fill info |
+| App ID (wx...) | From registered app (enterprise account required) |
 
-> ⚠️ App payment requires **enterprise/weChat verified** account. Individual accounts cannot use App Payment.
+> ⚠️ App Payment requires **verified enterprise account**. Individual accounts cannot use it.
 
 ---
 
-## Medium — CI/CD and Build Artifacts
+## Medium — CI/CD (GitHub Actions)
 
 ### 7. GitHub Actions Secrets
 
-> Configure in: GitHub Repo → Settings → Secrets and variables → Actions
+> **Current Setup**: Web deployed on **Vercel** (already configured ✅). 
+> GitHub Actions only builds **Android APK / iOS IPA**.
+> 
+> `release.yml` runs `npm run build` to bundle frontend into Android/iOS, which needs `VITE_*` env vars embedded at build time.
 
-| Secret | Used By | Required For |
-|--------|---------|------------|
-| `VITE_FIREBASE_API_KEY` | `release.yml` | Vite build |
-| `VITE_FIREBASE_AUTH_DOMAIN` | `release.yml` | Vite build |
-| `VITE_FIREBASE_PROJECT_ID` | `release.yml` | Vite build |
-| `VITE_FIREBASE_STORAGE_BUCKET` | `release.yml` | Vite build |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | `release.yml` | Vite build |
-| `VITE_FIREBASE_APP_ID` | `release.yml` | Vite build |
-| `VITE_GEMINI_API_KEY` | `release.yml` | Vite build |
-| `VITE_R2_PUBLIC_URL` | `release.yml` | Vite build |
-| `VITE_WX_APP_ID` | `release.yml` | Vite build |
-| `VITE_PAYMENT_SERVER_URL` | `release.yml` | Vite build |
-| `R2_ENDPOINT` | `release.yml` | Backend build |
-| `R2_ACCESS_KEY_ID` | `release.yml` | Backend build |
-| `R2_SECRET_ACCESS_KEY` | `release.yml` | Backend build |
-| `R2_BUCKET_NAME` | `release.yml` | Backend build |
-| `WX_MCHID` | `release.yml` | Backend build |
-| `WX_SERIAL_NO` | `release.yml` | Backend build |
-| `WX_PRIVATE_KEY_PATH` | `release.yml` | Backend build |
-| `WX_APIV3_KEY` | `release.yml` | Backend build |
-| `WX_APP_ID` | `release.yml` | Backend build |
-| `PAYMENT_SERVER_BASE_URL` | `release.yml` | Backend build |
+| Secret | Required For |
+|--------|--------------|
+| `VITE_FIREBASE_API_KEY` | Frontend build (embedded in APK) |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Frontend build |
+| `VITE_FIREBASE_PROJECT_ID` | Frontend build |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Frontend build |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Frontend build |
+| `VITE_FIREBASE_APP_ID` | Frontend build |
+| `VITE_GEMINI_API_KEY` | Frontend build |
+| `VITE_R2_PUBLIC_URL` | Frontend build |
+| `VITE_WX_APP_ID` | Frontend build |
+| `VITE_PAYMENT_SERVER_URL` | Frontend build |
+| `R2_ENDPOINT` | Backend (for R2 presign in APK) |
+| `R2_ACCESS_KEY_ID` | Backend |
+| `R2_SECRET_ACCESS_KEY` | Backend |
+| `R2_BUCKET_NAME` | Backend |
+| `WX_MCHID` | Backend (WeChat Pay) |
+| `WX_SERIAL_NO` | Backend |
+| `WX_PRIVATE_KEY_PATH` | Backend |
+| `WX_APIV3_KEY` | Backend |
+| `WX_APP_ID` | Backend |
+| `PAYMENT_SERVER_BASE_URL` | Backend |
 
 ### 8. Android Release Signing
 
-| Item | Env Var | Where to Get |
-|------|---------|-------------|
-| Keystore file (JKS/PKCS12) | `ANDROID_KEYSTORE_BASE64` | Generate with `keytool`, keep backup |
-| Store password | `ANDROID_STORE_PASSWORD` | You set this |
-| Key alias | `ANDROID_KEY_ALIAS` | You set this |
-| Key password | `ANDROID_KEY_PASSWORD` | You set this |
+| Item | Env Var | Status |
+|------|---------|--------|
+| Keystore | `ANDROID_KEYSTORE_BASE64` | ✅ `thoth-upload-key.jks` exists |
+| Store password | `ANDROID_STORE_PASSWORD` | ⚠️ Current: `Thoth@2026` (temp, change before release!) |
+| Key alias | `ANDROID_KEY_ALIAS` | `thoth-upload` |
+| Key password | `ANDROID_KEY_PASSWORD` | Same as store password |
 
-> Until these are configured, `release.yml` builds **debug APK only**. Signed release AAB is commented out.
+> Until configured, `release.yml` builds **debug APK only**.
 
-Generate a new keystore:
-```bash
-keytool -genkey -v -keystore thoth-release.jks \
-  -keyalg RSA -keysize 2048 -validity 10000 \
-  -alias thoth-release -storepass YOUR_STORE_PASSWORD \
-  -keypass YOUR_KEY_PASSWORD -dname "CN=Thoth"
-```
-
-### 9. iOS Code Signing
-
-> Requires a Mac to set up. Needed only for real device testing and App Store.
+### 9. iOS Code Signing (Mac required)
 
 | Item | Secret | How to Get |
 |------|--------|-----------|
-| .p12 Certificate | `IOS_P12_CERTIFICATE_BASE64` | macOS Keychain → Export Apple Distribution as .p12 → base64 encode |
+| .p12 Certificate | `IOS_P12_CERTIFICATE_BASE64` | Mac Keychain → Export .p12 |
 | .p12 Password | `IOS_P12_PASSWORD` | Set when exporting |
-| .mobileprovision | `IOS_PROVISIONING_PROFILE` | Apple Developer Portal → Certificates → Profiles |
-| Code Sign Identity | `IOS_CODE_SIGN_IDENTITY` | e.g. `Apple Distribution: Your Name (TEAM_ID)` |
-| Profile Name | `IOS_PROVISIONING_PROFILE_NAME` | From the .mobileprovision file |
-| Team ID | `IOS_TEAM_ID` | Apple Developer Portal → Account → Membership |
+| .mobileprovision | `IOS_PROVISIONING_PROFILE` | Apple Developer Portal |
+| Code Sign Identity | `IOS_CODE_SIGN_IDENTITY` | e.g. `Apple Distribution: Name (TEAM_ID)` |
+| Team ID | `IOS_TEAM_ID` | Apple Developer Portal → Membership |
 
-> For local development: open `ios/App/App.xcworkspace` in Xcode and configure signing manually.
+> For local dev: open `ios/App/App.xcworkspace` in Xcode (needs Mac).
 
 ---
 

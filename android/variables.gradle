@@ -22,7 +22,7 @@ ext {
     wearComposeBomVersion = '2024.02.00'
 
     // Kotlin
-    kotlinVersion = '2.0.21'
+    kotlinVersion = '2.1.20'
 
     // Firebase BoM
     firebaseBomVersion = '32.7.2'
