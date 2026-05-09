@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thoth — Privacy Policy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1a1a1a; margin-bottom: 10px; }
+        .effective-date { color: #666; margin-bottom: 30px; font-size: 14px; }
+        hr { border: none; border-top: 1px solid #eee; margin: 30px 0; }
+        h2 { color: #2a2a2a; margin-top: 30px; margin-bottom: 15px; font-size: 20px; }
+        h3 { color: #3a3a3a; margin-top: 20px; margin-bottom: 10px; font-size: 16px; }
+        p { margin-bottom: 15px; }
+        ul { margin-left: 20px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f9f9f9; font-weight: 600; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        strong { font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thoth — Privacy Policy</h1>
+        <p class="effective-date"><strong>Effective date: May 9, 2026</strong></p>
+
+        <p>Thoth ("we", "our", or "us") is a dream journal application. This Privacy Policy explains how Thoth collects, uses, and shares information when you use our mobile and web applications (collectively, the "Service").</p>
+
+        <p>By using Thoth, you agree to the collection and use of information in accordance with this policy.</p>
+
+        <hr>
+
+        <h2>1. Information We Collect</h2>
+
+        <h3>1.1 Information You Provide Directly</h3>
+        <ul>
+            <li><strong>Account Information</strong>: When you sign in via Google OAuth, we receive your Google account name and email address for authentication purposes.</li>
+            <li><strong>Voice Recordings</strong>: When you use the voice recording feature, audio files of your dream recordings are collected and stored. These recordings are associated with your authenticated account.</li>
+            <li><strong>Dream Content</strong>: Transcripts, tags, insights, and any text you enter into Thoth are stored in your personal account.</li>
+        </ul>
+
+        <h3>1.2 Information Collected Automatically</h3>
+        <ul>
+            <li><strong>Usage Data</strong>: We may collect basic usage metrics such as app opens, feature interactions, and session duration to improve the Service. This data is anonymized and aggregated where possible.</li>
+            <li><strong>Device Information</strong>: We may collect device type, operating system version, and app version for diagnostic and compatibility purposes.</li>
+        </ul>
+
+        <p>We <strong>do not</strong> collect real-time location data, browsing history, financial information, health data, photos, videos, or device identifiers beyond what is required for core functionality.</p>
+
+        <hr>
+
+        <h2>2. How We Use Your Information</h2>
+        <p>We use the information we collect to:</p>
+        <ul>
+            <li>Authenticate your identity and secure your account</li>
+            <li>Store and process your dream recordings and transcripts</li>
+            <li>Provide AI-powered transcription and tagging via Google Gemini AI</li>
+            <li>Sync your data across your devices</li>
+            <li>Send you in-app reminders (e.g., Memory Collapse countdown)</li>
+            <li>Maintain and improve the Service</li>
+        </ul>
+
+        <hr>
+
+        <h2>3. Third-Party Services</h2>
+        <p>Thoth uses the following third-party services, each with their own privacy policies:</p>
+
+        <table>
+            <tr>
+                <th>Service</th>
+                <th>Provider</th>
+                <th>Purpose</th>
+                <th>Privacy Policy</th>
+            </tr>
+            <tr>
+                <td>Firebase Authentication</td>
+                <td>Google</td>
+                <td>User sign-in</td>
+                <td><a href="https://firebase.google.com/support/privacy" target="_blank">firebase.google.com/support/privacy</a></td>
+            </tr>
+            <tr>
+                <td>Cloud Firestore</td>
+                <td>Google</td>
+                <td>Dream archive storage</td>
+                <td><a href="https://firebase.google.com/support/privacy" target="_blank">firebase.google.com/support/privacy</a></td>
+            </tr>
+            <tr>
+                <td>Firebase Storage</td>
+                <td>Google</td>
+                <td>Audio file storage</td>
+                <td><a href="https://firebase.google.com/support/privacy" target="_blank">firebase.google.com/support/privacy</a></td>
+            </tr>
+            <tr>
+                <td>Gemini AI</td>
+                <td>Google</td>
+                <td>Dream transcription and tagging</td>
+                <td><a href="https://policies.google.com/privacy" target="_blank">policies.google.com/privacy</a></td>
+            </tr>
+            <tr>
+                <td>Vercel</td>
+                <td>Vercel Inc.</td>
+                <td>Web hosting</td>
+                <td><a href="https://vercel.com/legal/privacy-policy" target="_blank">vercel.com/legal/privacy-policy</a></td>
+            </tr>
+        </table>
+
+        <p>Your dream content (audio recordings, transcripts, and metadata) is transmitted to Google Gemini AI for processing during the transcription step only. We do not sell, trade, or rent your personal information to any other third parties.</p>
+
+        <hr>
+
+        <h2>4. Data Storage and Security</h2>
+        <p>All data is stored on Google Firebase infrastructure, which employs industry-standard encryption:</p>
+        <ul>
+            <li><strong>In transit</strong>: Data is encrypted using HTTPS/TLS when transmitted between your device and our servers.</li>
+            <li><strong>At rest</strong>: Data stored in Firestore and Firebase Storage is encrypted at rest using Google's default AES-256 encryption.</li>
+        </ul>
+        <p>Your dream data is accessible only by your authenticated Google account. We implement access controls and regularly review our security practices to protect your data.</p>
+
+        <hr>
+
+        <h2>5. Data Retention</h2>
+        <p>You may delete your dream recordings and transcripts at any time through the app. Deleting a dream permanently removes the associated Firestore document and Firebase Storage file.</p>
+        <p>If you delete your Google account or revoke Thoth's access to your Google account, all associated data will be deleted from our systems within 30 days, unless we are required to retain it by law.</p>
+
+        <hr>
+
+        <h2>6. Your Rights</h2>
+        <p>Depending on your jurisdiction, you may have the right to:</p>
+        <ul>
+            <li><strong>Access</strong> the personal data we hold about you</li>
+            <li><strong>Correct</strong> inaccurate or incomplete data</li>
+            <li><strong>Delete</strong> your data (you can do this directly within the app)</li>
+            <li><strong>Export</strong> your data in a portable format</li>
+            <li><strong>Object to</strong> or <strong>restrict</strong> certain processing</li>
+        </ul>
+        <p>To exercise any of these rights, please contact us at the email address provided below. We will respond to your request within 30 days.</p>
+
+        <hr>
+
+        <h2>7. Children's Privacy</h2>
+        <p>Thoth is not intended for use by individuals under the age of 13. We do not knowingly collect personal information from children under 13. If we become aware that we have collected personal information from a child under 13, we will take steps to delete that information as soon as possible.</p>
+
+        <hr>
+
+        <h2>8. International Data Transfers</h2>
+        <p>Thoth is operated from and hosted on servers located primarily in the United States. If you are located outside the United States, please note that your data will be transferred to and processed in the United States, which may have different data protection laws than your country. By using Thoth, you consent to such transfer.</p>
+
+        <hr>
+
+        <h2>9. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new Privacy Policy on this page and updating the "Effective date" at the top.</p>
+        <p>Continued use of the Service after any changes constitutes your acceptance of the revised Privacy Policy.</p>
+
+        <hr>
+
+        <h2>10. Contact Us</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at:</p>
+        <p><strong>Email:</strong> <a href="mailto:zhaoceaser@gmail.com">zhaoceaser@gmail.com</a></p>
+
+        <hr>
+        <p style="text-align: center; color: #999; font-size: 14px; margin-top: 40px;">
+            © 2026 Thoth. All rights reserved.
+        </p>
+    </div>
+</body>
+</html>

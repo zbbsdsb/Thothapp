@@ -1,0 +1,44 @@
+site_name: Thoth
+site_description: AI-powered dream journal application
+site_url: https://zbbsdsb.github.io/Thothapp/
+
+repo_name: zbbsdsb/Thothapp
+repo_url: https://github.com/zbbsdsb/Thothapp
+
+nav:
+  - Home: index.md
+  - Privacy Policy: privacy.md
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true

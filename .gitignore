@@ -7,3 +7,9 @@ coverage/
 .env*
 !.env.example
 firebase-applet-config.json
+
+# MkDocs
+site/
+__pycache__/
+.mkdocs-cache/
+*.pyc
