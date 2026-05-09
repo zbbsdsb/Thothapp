@@ -30,7 +30,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.thoth.dreamarchive"
+        applicationId "oasis.thoth"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

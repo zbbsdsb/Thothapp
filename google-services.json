@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "736181376305",
+    "project_id": "gen-lang-client-0637750555",
+    "storage_bucket": "gen-lang-client-0637750555.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:736181376305:android:70496631e0e649fdb74c10",
+        "android_client_info": {
+          "package_name": "oasis.thoth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "736181376305-fa7r2e5kvqcdl1g63qb2e1bsirv1a9vk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTMvAl0TZy0Jl6yoVD1lu9oyrP5ZrtYH0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "736181376305-fa7r2e5kvqcdl1g63qb2e1bsirv1a9vk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
