@@ -111,6 +111,4 @@ Continued use of the Service after any changes constitutes your acceptance of th
 
 If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at:
 
-**Email:** [contact@thoth.app](mailto:contact@thoth.app)
-
-*(Replace with your actual contact email address before deploying.)*
+**Email:** [zhaoceaser@gmail.com](mailto:zhaoceaser@gmail.com)
