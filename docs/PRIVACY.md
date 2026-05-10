@@ -1,4 +1,4 @@
-# Thoth — Privacy Policy
+# Privacy Policy
 
 **Effective date: May 9, 2026**
 
