@@ -109,8 +109,8 @@ Start your dream journey today. Download Thoth now.
 | Asset | Specification | Status |
 |-------|---------------|--------|
 | **App Icon** | 512×512 px, 32-bit PNG | ✅ Exists (ic_launcher.png) |
-| **Feature Graphic** | 1024×500 px, JPG/PNG | ❌ Need to create |
-| **Screenshots (Phone)** | Min 2, Max 8, 16:9 or 9:16 | ❌ Need to capture |
+| **Feature Graphic** | 1024×500 px, JPG/PNG | ✅ Created (`store-assets/feature-graphic.png`) |
+| **Screenshots (Phone)** | Min 2, Max 8, 16:9 or 9:16 | ⏳ Need to capture (see `store-assets/SCREENSHOT_GUIDE.md`) |
 | **Screenshots (Tablet)** | Optional | ❌ Optional |
 | **Promo Video** | YouTube URL (optional) | ❌ Optional |
 
