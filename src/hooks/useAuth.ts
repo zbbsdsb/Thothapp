@@ -29,12 +29,42 @@ const DEFAULT_PROFILE: Omit<UserProfile, 'created_at' | 'email'> & {
   last_streak_date: null,
 };
 
+// SCREENSHOT MODE: Set to true to bypass Firebase auth for screenshots
+// Set to 'demo' to show demo authenticated state with mock data
+const SCREENSHOT_MODE: false | 'unauthenticated' | 'demo' = 'demo';
+
 export function useAuth() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!SCREENSHOT_MODE);
 
   useEffect(() => {
+    // In screenshot mode
+    if (SCREENSHOT_MODE) {
+      if (SCREENSHOT_MODE === 'demo') {
+        // Simulate authenticated user with demo profile
+        setUser({} as FirebaseUser); // Mock user object
+        setProfile({
+          email: 'demo@thoth.app',
+          created_at: Timestamp.now(),
+          daily_usage_count: 1,
+          daily_quota_limit: 3,
+          last_usage_date: null,
+          total_dreams: 5,
+          active_provider: 'gemini',
+          external_apis: {},
+          streak: 3,
+          last_streak_date: null,
+        });
+      } else {
+        // Show unauthenticated state
+        setUser(null);
+        setProfile(null);
+      }
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = auth.onAuthStateChanged(async (u) => {
       setUser(u);
       if (u) {

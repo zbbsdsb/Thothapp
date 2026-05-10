@@ -1,7 +1,7 @@
 {
-  "name": "Thoth - 梦境图书馆",
+  "name": "Thoth - AI Dream Journal",
   "short_name": "Thoth",
-  "description": "AI 驱动的梦境记录与分析工具",
+  "description": "AI-powered dream recording and analysis tool",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
