@@ -39,7 +39,7 @@
             android:name=".WXEntryActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@android:style/Translucent.NoTitleBar">
+            android:theme="@style/AppTheme.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

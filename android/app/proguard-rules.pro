@@ -6,7 +6,6 @@
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }
 -keepattributes Signature, InnerClasses, EnclosingMethod
--keepannotations com.google.firebase.** | com.google.android.gms.common.annotation.** | com.google.android.gms.**
 
 # Firebase BoM - keep version info
 -keep class com.google.firebase.auth.** { *; }
