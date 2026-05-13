@@ -9,5 +9,8 @@ object ServiceLocator {
     val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     val storage: FirebaseStorage by lazy { FirebaseStorage.getInstance() }
-    val repository: FirebaseRepository by lazy { FirebaseRepository(auth, firestore, storage) }
+    // Primary accessor — preferred name
+    val firebaseRepository: FirebaseRepository by lazy { FirebaseRepository(auth, firestore, storage) }
+    // Alias for backwards compatibility
+    val repository: FirebaseRepository get() = firebaseRepository
 }
