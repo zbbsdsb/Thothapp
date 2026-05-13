@@ -13,3 +13,9 @@ site/
 __pycache__/
 .mkdocs-cache/
 *.pyc
+
+# AI Assistant memory files
+.workbuddy/
+
+# Build outputs
+build_output*.txt
