@@ -1,3 +1,8 @@
+---
+title: "GitHub Pages Setup Guide"
+description: "Guide for setting up GitHub Pages for Thoth"
+category: "specs"
+---
 # GitHub Pages 部署指南
 
 ## 📋 当前状态

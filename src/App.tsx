@@ -14,12 +14,13 @@ import { RecordView } from './components/RecordView';
 import { HistoryView } from './components/HistoryView';
 import { GlobalView } from './components/GlobalView';
 import { SettingsView } from './components/SettingsView';
+import { DocsView } from './components/DocsView';
 import { DreamDetailModal } from './components/DreamDetailModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 
 import type { Dream } from './types';
 
-type Tab = 'record' | 'history' | 'global' | 'settings';
+type Tab = 'record' | 'history' | 'global' | 'settings' | 'docs';
 
 export default function App() {
   const { user, profile, loading } = useAuth();
@@ -97,6 +98,10 @@ export default function App() {
         </div>
       </div>
     );
+  }
+
+  if (activeTab === 'docs') {
+    return <DocsView />;
   }
 
   return (

@@ -1,3 +1,8 @@
+---
+title: "Privacy Policy"
+description: "Thoth app privacy policy"
+category: "specs"
+---
 # Privacy Policy
 
 **Effective date: May 9, 2026**

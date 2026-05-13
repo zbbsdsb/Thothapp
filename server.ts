@@ -6,11 +6,83 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import cors from "cors";
 import dotenv from "dotenv";
+import fs from "fs/promises";
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+/**
+ * Simple YAML frontmatter parser
+ * Handles:
+ * ---
+ * title: "My Title"
+ * description: "My Description"
+ * category: "guides"
+ * ---
+ * ... content ...
+ */
+function parseFrontmatter(content: string): { frontmatter: Record<string, any>; content: string } {
+  const frontmatterRegex = /^---\n([\s\S]*?)\n---\n?/;
+  const match = content.match(frontmatterRegex);
+  if (!match) {
+    return { frontmatter: {}, content };
+  }
+
+  const yamlStr = match[1];
+  const frontmatter: Record<string, any> = {};
+
+  // Parse simple YAML (key: value pairs)
+  const lines = yamlStr.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const colonIndex = trimmed.indexOf(":");
+    if (colonIndex === -1) continue;
+    const key = trimmed.slice(0, colonIndex).trim();
+    let value = trimmed.slice(colonIndex + 1).trim();
+    // Remove quotes if present
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    frontmatter[key] = value;
+  }
+
+  return { frontmatter, content: content.slice(match[0].length) };
+}
+
+/**
+ * Recursively find all markdown files in a directory
+ */
+async function findMarkdownFiles(dir: string, baseDir: string = dir): Promise<{ filePath: string; relativePath: string }[]> {
+  const files: { filePath: string; relativePath: string }[] = [];
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...(await findMarkdownFiles(fullPath, baseDir)));
+      } else if (entry.isFile() && entry.name.endsWith(".md")) {
+        const relativePath = path.relative(baseDir, fullPath);
+        files.push({ filePath: fullPath, relativePath });
+      }
+    }
+  } catch (e) {
+    // Directory doesn't exist, return empty
+  }
+  return files;
+}
+
+/**
+ * Determine category from file path
+ */
+function getCategoryFromPath(relativePath: string, frontmatter: Record<string, any>): string {
+  if (frontmatter.category) return frontmatter.category;
+  if (relativePath.includes("features")) return "features";
+  if (relativePath.includes("guides")) return "guides";
+  return "specs";
+}
 
 const ALLOWED_ORIGINS = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(",")
@@ -74,6 +146,55 @@ async function startServer() {
   // API Routes
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok" });
+  });
+
+  // Docs API Routes
+  app.get("/api/docs", async (_req, res) => {
+    try {
+      const docsDir = path.join(__dirname, "docs");
+      const mdFiles = await findMarkdownFiles(docsDir, docsDir);
+      const docs = [];
+
+      for (const { filePath, relativePath } of mdFiles) {
+        const content = await fs.readFile(filePath, "utf-8");
+        const { frontmatter } = parseFrontmatter(content);
+        const category = getCategoryFromPath(relativePath, frontmatter);
+        docs.push({
+          id: relativePath.replace(/\\/g, "/").replace(".md", ""),
+          title: frontmatter.title || path.basename(filePath, ".md"),
+          description: frontmatter.description || "",
+          category,
+          relativePath: relativePath.replace(/\\/g, "/"),
+        });
+      }
+
+      res.json(docs);
+    } catch (error) {
+      console.error("Docs list error:", error);
+      res.status(500).json({ error: "Failed to fetch docs" });
+    }
+  });
+
+  app.get("/api/docs/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const docsDir = path.join(__dirname, "docs");
+      const filePath = path.join(docsDir, `${id}.md`);
+      const content = await fs.readFile(filePath, "utf-8");
+      const { frontmatter, content: body } = parseFrontmatter(content);
+      const category = getCategoryFromPath(id, frontmatter);
+
+      res.json({
+        id,
+        title: frontmatter.title || path.basename(filePath, ".md"),
+        description: frontmatter.description || "",
+        category,
+        content: body,
+      });
+    } catch (error) {
+      console.error("Doc fetch error:", error);
+      res.status(404).json({ error: "Doc not found" });
+    }
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -291,260 +412,259 @@ async function startServer() {
       console.error('[WeChat] Query error:', err);
       res.status(500).json({ error: err.message });
     }
-  }
-}
+  });
 
-// ─────────────────────────────────────────────────────────────────────────
-// Alipay — App Payment
-// Prerequisites: ALIPAY_APP_ID, ALIPAY_PRIVATE_KEY, ALIPAY_PUBLIC_KEY, ALIPAY_GATEWAY
-// ─────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
+  // Alipay — App Payment
+  // Prerequisites: ALIPAY_APP_ID, ALIPAY_PRIVATE_KEY, ALIPAY_PUBLIC_KEY, ALIPAY_GATEWAY
+  // ─────────────────────────────────────────────────────────────────────────
 
-const alipayAppId = process.env.ALIPAY_APP_ID ?? '';
-const alipayPrivateKey = process.env.ALIPAY_PRIVATE_KEY ?? '';
-const alipayPublicKey = process.env.ALIPAY_PUBLIC_KEY ?? '';
-const alipayGateway = process.env.ALIPAY_GATEWAY ?? 'https://openapi.alipay.com/gateway.do';
-const alipayNotifyUrl = process.env.ALIPAY_NOTIFY_URL ?? `${process.env.PAYMENT_SERVER_BASE_URL ?? 'https://api.thothapp.com'}/api/alipay/callback`;
+  const alipayAppId = process.env.ALIPAY_APP_ID ?? '';
+  const alipayPrivateKey = process.env.ALIPAY_PRIVATE_KEY ?? '';
+  const alipayPublicKey = process.env.ALIPAY_PUBLIC_KEY ?? '';
+  const alipayGateway = process.env.ALIPAY_GATEWAY ?? 'https://openapi.alipay.com/gateway.do';
+  const alipayNotifyUrl = process.env.ALIPAY_NOTIFY_URL ?? `${process.env.PAYMENT_SERVER_BASE_URL ?? 'https://api.thothapp.com'}/api/alipay/callback`;
 
-// Minimal in-memory Alipay order store (replace with DB in production)
-const alipayOrderStore = new Map<string, {
-  status: 'pending' | 'success' | 'failed' | 'cancelled';
-  transactionId?: string;
-  createdAt: number;
-}>();
+  // Minimal in-memory Alipay order store (replace with DB in production)
+  const alipayOrderStore = new Map<string, {
+    status: 'pending' | 'success' | 'failed' | 'cancelled';
+    transactionId?: string;
+    createdAt: number;
+  }>();
 
-/**
- * Helper: Build Alipay request parameters with RSA2 signature
- */
-function buildAlipayRequestParams(method: string, bizContent: any): Record<string, string> {
-  const crypto = require('crypto');
-  const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+  /**
+   * Helper: Build Alipay request parameters with RSA2 signature
+   */
+  function buildAlipayRequestParams(method: string, bizContent: any): Record<string, string> {
+    const crypto = require('crypto');
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
-  const params: Record<string, string> = {
-    app_id: alipayAppId,
-    method,
-    format: 'JSON',
-    charset: 'utf-8',
-    sign_type: 'RSA2',
-    timestamp,
-    version: '1.0',
-    biz_content: JSON.stringify(bizContent),
-  };
-
-  // Add notify_url for app pay
-  if (method === 'alipay.trade.app.pay') {
-    params.notify_url = alipayNotifyUrl;
-  }
-
-  // Sort parameters alphabetically
-  const sortedKeys = Object.keys(params).sort();
-  let signStr = sortedKeys.map(key => `${key}=${params[key]}`).join('&');
-
-  // Sign with RSA2
-  const signer = crypto.createSign('RSA-SHA256');
-  signer.update(signStr);
-  const privateKeyPem = formatPrivateKey(alipayPrivateKey);
-  const sign = signer.sign(privateKeyPem, 'base64');
-
-  params.sign = sign;
-
-  return params;
-}
-
-/**
- * Helper: Format private key to PEM format
- */
-function formatPrivateKey(key: string): string {
-  if (!key.includes('-----BEGIN')) {
-    return `-----BEGIN PRIVATE KEY-----\n${key.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
-  }
-  return key;
-}
-
-/**
- * Helper: Format public key to PEM format
- */
-function formatPublicKey(key: string): string {
-  if (!key.includes('-----BEGIN')) {
-    return `-----BEGIN PUBLIC KEY-----\n${key.match(/.{1,64}/g)?.join('\n')}\n-----END PUBLIC KEY-----`;
-  }
-  return key;
-}
-
-/**
- * Helper: Verify Alipay notification signature
- */
-function verifyAlipayNotify(params: Record<string, string>): boolean {
-  const crypto = require('crypto');
-
-  // Extract sign and sign_type
-  const { sign, sign_type, ...restParams } = params;
-
-  // Sort parameters alphabetically
-  const sortedKeys = Object.keys(restParams).sort();
-  let signStr = sortedKeys.map(key => `${key}=${restParams[key]}`).join('&');
-
-  // Verify with RSA2
-  const verifier = crypto.createVerify('RSA-SHA256');
-  verifier.update(signStr);
-  const publicKeyPem = formatPublicKey(alipayPublicKey);
-
-  return verifier.verify(publicKeyPem, sign, 'base64');
-}
-
-/**
- * POST /api/alipay/create-order
- * Create an Alipay App payment order.
- * Returns signed orderStr for Alipay SDK.
- */
-app.post('/api/alipay/create-order', async (req, res) => {
-  try {
-    const { out_trade_no, total_amount, subject, attach = '' } = req.body;
-
-    if (!out_trade_no || !total_amount || !subject) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    // Build Alipay order parameters
-    const bizContent = {
-      out_trade_no,
-      total_amount: total_amount.toFixed(2),
-      subject,
-      body: attach,
-      product_code: 'QUICK_MSECURITY_PAY',
+    const params: Record<string, string> = {
+      app_id: alipayAppId,
+      method,
+      format: 'JSON',
+      charset: 'utf-8',
+      sign_type: 'RSA2',
+      timestamp,
+      version: '1.0',
+      biz_content: JSON.stringify(bizContent),
     };
 
-    const params = buildAlipayRequestParams('alipay.trade.app.pay', bizContent);
+    // Add notify_url for app pay
+    if (method === 'alipay.trade.app.pay') {
+      params.notify_url = alipayNotifyUrl;
+    }
 
-    // Build orderStr for SDK
-    const orderStr = Object.keys(params)
-      .sort()
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-      .join('&');
+    // Sort parameters alphabetically
+    const sortedKeys = Object.keys(params).sort();
+    let signStr = sortedKeys.map(key => `${key}=${params[key]}`).join('&');
 
-    // Store order locally
-    alipayOrderStore.set(out_trade_no, {
-      status: 'pending',
-      createdAt: Date.now(),
-    });
+    // Sign with RSA2
+    const signer = crypto.createSign('RSA-SHA256');
+    signer.update(signStr);
+    const privateKeyPem = formatPrivateKey(alipayPrivateKey);
+    const sign = signer.sign(privateKeyPem, 'base64');
 
-    return res.json({
-      orderStr,
-      outTradeNo: out_trade_no,
-    });
-  } catch (err: any) {
-    console.error('[Alipay] Create order error:', err);
-    res.status(500).json({ error: err.message });
+    params.sign = sign;
+
+    return params;
   }
-});
 
-/**
- * POST /api/alipay/callback
- * Alipay async payment notification.
- * Respond with 'success' to acknowledge receipt.
- */
-app.post('/api/alipay/callback', express.urlencoded({ extended: true }), async (req, res) => {
-  try {
-    const params = req.body as Record<string, string>;
-
-    // Verify signature
-    const isValid = verifyAlipayNotify(params);
-    if (!isValid) {
-      console.error('[Alipay] Invalid notification signature');
-      return res.send('fail');
+  /**
+   * Helper: Format private key to PEM format
+   */
+  function formatPrivateKey(key: string): string {
+    if (!key.includes('-----BEGIN')) {
+      return `-----BEGIN PRIVATE KEY-----\n${key.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
     }
-
-    const { out_trade_no, trade_status, trade_no } = params;
-
-    // Update order status
-    let status: 'pending' | 'success' | 'failed' | 'cancelled' = 'pending';
-    if (trade_status === 'TRADE_SUCCESS' || trade_status === 'TRADE_FINISHED') {
-      status = 'success';
-    } else if (trade_status === 'TRADE_CLOSED') {
-      status = 'cancelled';
-    }
-
-    if (alipayOrderStore.has(out_trade_no)) {
-      alipayOrderStore.get(out_trade_no)!.status = status;
-      alipayOrderStore.get(out_trade_no)!.transactionId = trade_no;
-    }
-
-    console.log(`[Alipay Callback] ${out_trade_no} → ${trade_status}`);
-    return res.send('success');
-  } catch (err: any) {
-    console.error('[Alipay] Callback error:', err);
-    res.send('fail');
+    return key;
   }
-});
 
-/**
- * GET /api/alipay/query-order
- * Query Alipay order status (for client polling fallback).
- */
-app.get('/api/alipay/query-order', async (req, res) => {
-  try {
-    const { out_trade_no } = req.query as { out_trade_no: string };
+  /**
+   * Helper: Format public key to PEM format
+   */
+  function formatPublicKey(key: string): string {
+    if (!key.includes('-----BEGIN')) {
+      return `-----BEGIN PUBLIC KEY-----\n${key.match(/.{1,64}/g)?.join('\n')}\n-----END PUBLIC KEY-----`;
+    }
+    return key;
+  }
 
-    if (!out_trade_no) return res.status(400).json({ error: 'Missing out_trade_no' });
+  /**
+   * Helper: Verify Alipay notification signature
+   */
+  function verifyAlipayNotify(params: Record<string, string>): boolean {
+    const crypto = require('crypto');
 
-    // Check local store first (fast)
-    const local = alipayOrderStore.get(out_trade_no);
-    if (local && local.status !== 'pending') {
+    // Extract sign and sign_type
+    const { sign, sign_type, ...restParams } = params;
+
+    // Sort parameters alphabetically
+    const sortedKeys = Object.keys(restParams).sort();
+    let signStr = sortedKeys.map(key => `${key}=${restParams[key]}`).join('&');
+
+    // Verify with RSA2
+    const verifier = crypto.createVerify('RSA-SHA256');
+    verifier.update(signStr);
+    const publicKeyPem = formatPublicKey(alipayPublicKey);
+
+    return verifier.verify(publicKeyPem, sign, 'base64');
+  }
+
+  /**
+   * POST /api/alipay/create-order
+   * Create an Alipay App payment order.
+   * Returns signed orderStr for Alipay SDK.
+   */
+  app.post('/api/alipay/create-order', async (req, res) => {
+    try {
+      const { out_trade_no, total_amount, subject, attach = '' } = req.body;
+
+      if (!out_trade_no || !total_amount || !subject) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Build Alipay order parameters
+      const bizContent = {
+        out_trade_no,
+        total_amount: total_amount.toFixed(2),
+        subject,
+        body: attach,
+        product_code: 'QUICK_MSECURITY_PAY',
+      };
+
+      const params = buildAlipayRequestParams('alipay.trade.app.pay', bizContent);
+
+      // Build orderStr for SDK
+      const orderStr = Object.keys(params)
+        .sort()
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+        .join('&');
+
+      // Store order locally
+      alipayOrderStore.set(out_trade_no, {
+        status: 'pending',
+        createdAt: Date.now(),
+      });
+
+      return res.json({
+        orderStr,
+        outTradeNo: out_trade_no,
+      });
+    } catch (err: any) {
+      console.error('[Alipay] Create order error:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /**
+   * POST /api/alipay/callback
+   * Alipay async payment notification.
+   * Respond with 'success' to acknowledge receipt.
+   */
+  app.post('/api/alipay/callback', express.urlencoded({ extended: true }), async (req, res) => {
+    try {
+      const params = req.body as Record<string, string>;
+
+      // Verify signature
+      const isValid = verifyAlipayNotify(params);
+      if (!isValid) {
+        console.error('[Alipay] Invalid notification signature');
+        return res.send('fail');
+      }
+
+      const { out_trade_no, trade_status, trade_no } = params;
+
+      // Update order status
+      let status: 'pending' | 'success' | 'failed' | 'cancelled' = 'pending';
+      if (trade_status === 'TRADE_SUCCESS' || trade_status === 'TRADE_FINISHED') {
+        status = 'success';
+      } else if (trade_status === 'TRADE_CLOSED') {
+        status = 'cancelled';
+      }
+
+      if (alipayOrderStore.has(out_trade_no)) {
+        alipayOrderStore.get(out_trade_no)!.status = status;
+        alipayOrderStore.get(out_trade_no)!.transactionId = trade_no;
+      }
+
+      console.log(`[Alipay Callback] ${out_trade_no} → ${trade_status}`);
+      return res.send('success');
+    } catch (err: any) {
+      console.error('[Alipay] Callback error:', err);
+      res.send('fail');
+    }
+  });
+
+  /**
+   * GET /api/alipay/query-order
+   * Query Alipay order status (for client polling fallback).
+   */
+  app.get('/api/alipay/query-order', async (req, res) => {
+    try {
+      const { out_trade_no } = req.query as { out_trade_no: string };
+
+      if (!out_trade_no) return res.status(400).json({ error: 'Missing out_trade_no' });
+
+      // Check local store first (fast)
+      const local = alipayOrderStore.get(out_trade_no);
+      if (local && local.status !== 'pending') {
+        return res.json({
+          outTradeNo: out_trade_no,
+          tradeState: local.status,
+          transactionId: local.transactionId ?? '',
+          tradeStateDesc: local.status,
+        });
+      }
+
+      // Fallback: Query Alipay directly
+      const bizContent = { out_trade_no };
+      const params = buildAlipayRequestParams('alipay.trade.query', bizContent);
+
+      const queryStr = Object.keys(params)
+        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+        .join('&');
+
+      const alipayRes = await fetch(`${alipayGateway}?${queryStr}`, {
+        method: 'GET',
+      });
+
+      const alipayData = await alipayRes.json();
+      const response = alipayData.alipay_trade_query_response;
+
+      if (response.code !== '10000') {
+        return res.status(404).json({ error: response.sub_msg || 'Order not found' });
+      }
+
+      let tradeState: 'pending' | 'success' | 'failed' | 'cancelled' = 'pending';
+      if (response.trade_status === 'TRADE_SUCCESS' || response.trade_status === 'TRADE_FINISHED') {
+        tradeState = 'success';
+      } else if (response.trade_status === 'TRADE_CLOSED') {
+        tradeState = 'cancelled';
+      } else {
+        tradeState = 'pending';
+      }
+
+      // Update local store
+      if (alipayOrderStore.has(out_trade_no)) {
+        alipayOrderStore.get(out_trade_no)!.status = tradeState;
+        alipayOrderStore.get(out_trade_no)!.transactionId = response.trade_no;
+      }
+
       return res.json({
         outTradeNo: out_trade_no,
-        tradeState: local.status,
-        transactionId: local.transactionId ?? '',
-        tradeStateDesc: local.status,
+        tradeState,
+        transactionId: response.trade_no ?? '',
+        tradeStateDesc: response.trade_status ?? '',
       });
+    } catch (err: any) {
+      console.error('[Alipay] Query error:', err);
+      res.status(500).json({ error: err.message });
     }
+  });
 
-    // Fallback: Query Alipay directly
-    const bizContent = { out_trade_no };
-    const params = buildAlipayRequestParams('alipay.trade.query', bizContent);
-
-    const queryStr = Object.keys(params)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-      .join('&');
-
-    const alipayRes = await fetch(`${alipayGateway}?${queryStr}`, {
-      method: 'GET',
-    });
-
-    const alipayData = await alipayRes.json();
-    const response = alipayData.alipay_trade_query_response;
-
-    if (response.code !== '10000') {
-      return res.status(404).json({ error: response.sub_msg || 'Order not found' });
-    }
-
-    let tradeState: 'pending' | 'success' | 'failed' | 'cancelled' = 'pending';
-    if (response.trade_status === 'TRADE_SUCCESS' || response.trade_status === 'TRADE_FINISHED') {
-      tradeState = 'success';
-    } else if (response.trade_status === 'TRADE_CLOSED') {
-      tradeState = 'cancelled';
-    } else {
-      tradeState = 'pending';
-    }
-
-    // Update local store
-    if (alipayOrderStore.has(out_trade_no)) {
-      alipayOrderStore.get(out_trade_no)!.status = tradeState;
-      alipayOrderStore.get(out_trade_no)!.transactionId = response.trade_no;
-    }
-
-    return res.json({
-      outTradeNo: out_trade_no,
-      tradeState,
-      transactionId: response.trade_no ?? '',
-      tradeStateDesc: response.trade_status ?? '',
-    });
-  } catch (err: any) {
-    console.error('[Alipay] Query error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ─────────────────────────────────────────────────────────────────────────
-// R2 Upload
+  // ─────────────────────────────────────────────────────────────────────────
+  // R2 Upload
   // ─────────────────────────────────────────────────────────────────────────
 
   // Get Presigned URL for R2 Upload

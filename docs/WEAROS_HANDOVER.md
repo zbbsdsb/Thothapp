@@ -1,3 +1,8 @@
+---
+title: "WearOS Development Handover"
+description: "Thoth WearOS app development handover documentation"
+category: "specs"
+---
 # Thoth WearOS — Development Handover (for New Team)
 
 > **Language**: English

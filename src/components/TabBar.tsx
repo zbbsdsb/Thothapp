@@ -1,14 +1,15 @@
-import { Mic2, History, Globe, Settings } from 'lucide-react';
+import { Mic2, History, Globe, Settings, BookOpen } from 'lucide-react';
 
 interface TabBarProps {
   activeTab: string;
-  onTabChange: (tab: 'record' | 'history' | 'global' | 'settings') => void;
+  onTabChange: (tab: 'record' | 'history' | 'global' | 'settings' | 'docs') => void;
 }
 
 const TABS = [
   { id: 'record', icon: Mic2, label: 'Capture' },
   { id: 'history', icon: History, label: 'Archive' },
   { id: 'global', icon: Globe, label: 'Collective' },
+  { id: 'docs', icon: BookOpen, label: 'Docs' },
   { id: 'settings', icon: Settings, label: 'Profile' },
 ] as const;
 

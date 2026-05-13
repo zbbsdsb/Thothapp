@@ -1,3 +1,8 @@
+---
+title: "iOS Development Plan"
+description: "Plan for adding iOS support via Capacitor"
+category: "specs"
+---
 # Thoth iOS Development Plan
 
 ## Overview

@@ -1,3 +1,8 @@
+---
+title: "Thoth - AI-Powered Dream Journal"
+description: "Thoth helps you capture, understand, and explore your dreams with AI-powered analysis."
+category: "specs"
+---
 # Thoth
 
 **AI-Powered Dream Journal**

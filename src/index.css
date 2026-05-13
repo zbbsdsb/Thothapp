@@ -49,3 +49,111 @@
 .mask-fade-y {
   mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
 }
+
+.docs-container {
+  @apply min-h-screen flex flex-col;
+}
+
+.docs-layout {
+  @apply flex flex-1 overflow-hidden;
+}
+
+.docs-sidebar {
+  @apply w-64 border-r border-white/10 bg-zinc-900/50 flex flex-col;
+}
+
+.category-tabs {
+  @apply flex flex-col p-4 gap-2 border-b border-white/10;
+}
+
+.category-tabs button {
+  @apply px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-all;
+}
+
+.category-tabs button.active {
+  @apply text-white bg-white/10 font-medium;
+}
+
+.docs-list {
+  @apply flex-1 overflow-y-auto p-4 space-y-4;
+}
+
+.docs-group {
+  @apply space-y-2;
+}
+
+.docs-group h3 {
+  @apply text-xs font-semibold text-zinc-500 uppercase tracking-wider;
+}
+
+.docs-list button {
+  @apply w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-all block;
+}
+
+.docs-list button.active {
+  @apply text-white bg-white/10 font-medium;
+}
+
+.docs-main {
+  @apply flex-1 overflow-y-auto p-8 md:p-12;
+}
+
+.doc-content {
+  @apply max-w-3xl mx-auto;
+}
+
+.doc-content h2 {
+  @apply text-3xl font-bold mb-3;
+}
+
+.doc-content h3 {
+  @apply text-2xl font-semibold mt-8 mb-3;
+}
+
+.doc-content h4 {
+  @apply text-xl font-semibold mt-6 mb-2;
+}
+
+.doc-content .doc-description {
+  @apply text-zinc-400 mb-8;
+}
+
+.doc-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+.doc-content ul, .doc-content ol {
+  @apply ml-6 mb-4 space-y-2;
+}
+
+.doc-content li {
+  @apply list-disc;
+}
+
+.doc-content pre {
+  @apply bg-zinc-900/80 p-4 rounded-xl my-4 overflow-x-auto text-sm;
+}
+
+.doc-content code {
+  @apply font-mono text-sm bg-white/5 px-1.5 py-0.5 rounded;
+}
+
+.doc-content pre code {
+  @apply bg-transparent p-0;
+}
+
+.doc-content table {
+  @apply w-full my-6 border-collapse;
+}
+
+.doc-content th, .doc-content td {
+  @apply border border-white/10 px-4 py-2 text-left;
+}
+
+.doc-content th {
+  @apply bg-white/5 font-medium;
+}
+
+.doc-placeholder {
+  @apply flex flex-col items-center justify-center h-full text-center text-zinc-500;
+}

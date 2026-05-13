@@ -1,3 +1,8 @@
+---
+title: "Architecture"
+description: "Technical architecture overview of Thoth"
+category: "specs"
+---
 # Thoth Architecture
 
 Thoth is a full-stack application designed for high-performance dream archiving and AI analysis.

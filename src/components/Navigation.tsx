@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Mic2, History, Globe, Settings, User } from 'lucide-react';
+import { Mic2, History, Globe, Settings, User, BookOpen } from 'lucide-react';
 import { ThothLogo } from './Logo';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
@@ -8,13 +8,14 @@ import type { FirebaseUser } from 'firebase/auth';
 interface NavigationProps {
   user: FirebaseUser | null;
   activeTab: string;
-  onTabChange: (tab: 'record' | 'history' | 'global' | 'settings') => void;
+  onTabChange: (tab: 'record' | 'history' | 'global' | 'settings' | 'docs') => void;
 }
 
 const NAV_ITEMS = [
   { id: 'record', label: 'Capture', icon: Mic2 },
   { id: 'history', label: 'Archive', icon: History },
   { id: 'global', label: 'Collective', icon: Globe },
+  { id: 'docs', label: 'Docs', icon: BookOpen },
   { id: 'settings', label: 'Settings', icon: Settings },
 ] as const;
 

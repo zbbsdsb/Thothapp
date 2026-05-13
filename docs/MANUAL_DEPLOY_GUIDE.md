@@ -1,3 +1,8 @@
+---
+title: "Manual Deploy Guide"
+description: "Guide for manually deploying docs to GitHub Pages"
+category: "specs"
+---
 # 手动启用 GitHub Pages 指南
 
 ## 🚀 最简单的方法（5分钟搞定）

@@ -1,3 +1,8 @@
+---
+title: "Project Structure"
+description: "Thoth app project structure documentation"
+category: "specs"
+---
 # Thoth Project Structure
 
 This document describes the actual structure of the Thoth AI Dream Archive project — a cross-platform dream journal app built with Capacitor (Android/iOS) + React Web, sharing core logic via npm workspaces.

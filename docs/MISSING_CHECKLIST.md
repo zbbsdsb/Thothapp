@@ -1,3 +1,8 @@
+---
+title: "Missing Items Checklist"
+description: "Checklist of items required before production release"
+category: "specs"
+---
 # Thoth — Missing Items Checklist
 
 > Items required before a production build or release can run end-to-end.
@@ -127,7 +132,7 @@
 
 | Item | Env Var | Status |
 |------|---------|--------|
-| Keystore | `ANDROID_KEYSTORE_BASE64` | ✅ `thoth-upload-key.jks` exists |
+| Keystore | `ANDROID_KEYSTORE_BASE64` | ✅ `thoth-upload-key.jks exists |
 | Store password | `ANDROID_STORE_PASSWORD` | ⚠️ Current: `Thoth@2026` (temp, change before release!) |
 | Key alias | `ANDROID_KEY_ALIAS` | `thoth-upload` |
 | Key password | `ANDROID_KEY_PASSWORD` | Same as store password |

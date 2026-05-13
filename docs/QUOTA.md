@@ -1,3 +1,8 @@
+---
+title: "Quota & Usage"
+description: "Thoth app usage quotas and API key configuration"
+category: "specs"
+---
 # Quota & Usage
 
 Thoth offers a flexible usage model to ensure everyone can archive their dreams.

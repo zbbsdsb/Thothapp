@@ -1,3 +1,8 @@
+---
+title: "Technical Documentation"
+description: "Thoth app detailed technical documentation"
+category: "specs"
+---
 # Thoth Technical Documentation
 
 This document provides detailed technical documentation for the Thoth AI Dream Archive project, including architecture, implementation details, and usage guidelines.

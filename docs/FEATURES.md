@@ -1,3 +1,8 @@
+---
+title: "Features"
+description: "Overview of all features in Thoth"
+category: "features"
+---
 # Thoth Features
 
 Thoth is more than just a dream journal; it's a sophisticated psychological tool designed to capture the most ephemeral parts of your consciousness.

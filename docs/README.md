@@ -1,3 +1,8 @@
+---
+title: "Thoth - AI Dream Archive"
+description: "Welcome to Thoth, the definitive archive of the human subconscious"
+category: "specs"
+---
 # Thoth - AI Dream Archive
 
 Welcome to **Thoth**, the definitive archive of the human subconscious. Powered by **dreambase**, Thoth is a mystical digital sanctuary designed to capture, analyze, and preserve the ephemeral imagery of your dreams for the future metaverse.

@@ -1,3 +1,8 @@
+---
+title: "Payment Integration"
+description: "WeChat Pay integration guide"
+category: "specs"
+---
 # WeChat Pay — App Payment Integration Guide
 
 ## Overview

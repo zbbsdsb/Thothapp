@@ -1,3 +1,8 @@
+---
+title: "API Documentation"
+description: "Technical API documentation for Thoth services"
+category: "specs"
+---
 # Thoth API Documentation
 
 This document provides detailed documentation for the core APIs and services used in the Thoth AI Dream Archive project.

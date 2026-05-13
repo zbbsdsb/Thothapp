@@ -1,3 +1,8 @@
+---
+title: "Android Development Plan"
+description: "Plan for developing Thoth Android app with Capacitor"
+category: "specs"
+---
 # Thoth Android Development Plan
 
 ## Overview

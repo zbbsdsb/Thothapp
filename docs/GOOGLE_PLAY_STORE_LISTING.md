@@ -1,3 +1,8 @@
+---
+title: "Google Play Store Listing"
+description: "Store listing content for Google Play"
+category: "specs"
+---
 # Thoth — Google Play Store Listing
 
 > **App Name**: Thoth

@@ -1,3 +1,8 @@
+---
+title: "dreambase"
+description: "dreambase: The Imagery Infrastructure for Thoth"
+category: "specs"
+---
 # dreambase: The Imagery Infrastructure
 
 ## Overview

@@ -1,3 +1,8 @@
+---
+title: "Alipay Integration"
+description: "Guide for integrating Alipay App Payment into Thoth"
+category: "specs"
+---
 # Alipay (App Payment) Integration Guide
 
 ## Overview
