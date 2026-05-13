@@ -21,10 +21,10 @@ A 3-minute high-stakes timer that triggers upon waking. This mechanism leverages
 ### Ghost Prompts
 Based on the Zeigarnik effect, Thoth identifies days when you've missed recording a dream and provides a "Ghost Prompt" in your archive. This creates a sense of an "unfinished task," prompting you to recover the lost signal.
 
-## ⌚ Watch Mode (Experimental)
+## ⌚ Watch Mode (WearOS)
 
-### Deep Sleep Monitoring
-A specialized interface for circular displays (like smartwatches) that monitors your sleep state. It triggers the recording prompt exactly when you wake up, ensuring the highest possible memory recall.
+### Standalone WearOS App
+A dedicated WearOS companion app (`android/wear/`) that works without the phone app. The watch connects directly to Firebase and records audio with a single tap — optimized for the immediate post-waking state.
 
 ### Complication UI
 A refined, watch-face inspired countdown and status display that fits perfectly on small, circular screens.
@@ -38,4 +38,4 @@ An interactive D3-powered visualization that maps the distribution of dreams acr
 A real-time leaderboard of the most common symbols and themes currently appearing in the collective subconscious.
 
 ---
-*Thoth Features v1.0.0*
+*Thoth Features v2.0.0 — Updated 2026-05-12*

@@ -1,7 +1,7 @@
 # Thoth — Next Action Plan
 
-> **Last Updated**: 2026-05-05
-> **Based on**: MISSING_CHECKLIST.md, planning/NEXT_STEPS.md, planning/ROADMAP.md
+> **Last Updated**: 2026-05-12
+> **Based on**: MISSING_CHECKLIST.md, planning/NEXT_STEPS.md, planning/ROADMAP.md, docs/WEAROS_HANDOVER.md
 
 ---
 
@@ -12,7 +12,7 @@
 | Web 前端（Vercel + Firebase）| ✅ 已部署，已连接 |
 | Android APK 构建 | ⚠️ 需要 `google-services.json` |
 | iOS 壳子 | ⚠️ 已 scaffold，等 Mac |
-| WearOS | 📋 计划已写，未开始 |
+| WearOS | ✅ W0 scaffold + W1 recording flow complete; ❌ Firebase init crash (blocker); W2/W3 outstanding — see `docs/WEAROS_HANDOVER.md` |
 | 微信支付 | ⚠️ 代码已写，等商户凭证 |
 | R2 存储 | ⚠️ 代码已写，等凭证 |
 

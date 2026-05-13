@@ -1,7 +1,8 @@
 # Next Steps — Post Device Migration
 
 > **Purpose**: Follow this guide after setting up Thothapp on your new device.
-> **Last Updated**: 2025-05-05
+> **Last Updated**: 2026-05-12
+> **⚠️ Status Notice**: Core setup steps are still valid. SHA-256 fingerprints below were generated in May 2025 — re-verify against your current keystore before registering with Firebase Console. WearOS sections have been superseded by `docs/WEAROS_HANDOVER.md`.
 
 ---
 

@@ -12,8 +12,8 @@ This document describes the actual structure of the Thoth AI Dream Archive proje
 thoth/
 ├── src/                    # Web app (React + Vite + TailwindCSS)
 ├── packages/
-│   ├── common/             # Shared core logic (AI, data, Firebase)
-│   └── ui/                 # Shared React UI components
+│   ├── common/             # [UNUSED] Duplicate of src/lib/ — do not add code here
+│   └── ui/                 # [UNUSED] Duplicate of src/components/ — do not add code here
 ├── android/                # Android app (Capacitor native layer)
 ├── ios/                    # iOS app (Capacitor native layer)
 ├── docs/                   # Project documentation

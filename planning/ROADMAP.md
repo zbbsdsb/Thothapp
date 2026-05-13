@@ -1,7 +1,8 @@
 # Thoth App — Product Roadmap
 
-> **Status**: Updated 2025-05-05
+> **Status**: Updated 2026-05-12 (original roadmap written 2025-05-05)
 > **Current Version**: v2.0.0 (Post-migration, security-hardened)
+> **⚠️ Status Notice**: Phase roadmap items below reflect the original plan. For current WearOS progress, see `docs/WEAROS_HANDOVER.md`. The Keystore password item (line 41) is a live security concern — do NOT leave `Thoth@2026` in production.
 
 ---
 

@@ -13,9 +13,9 @@ The system is built on a modern, serverless-first architecture:
 - **Data Visualization**: D3.js and TopoJSON for the interactive Global Imagery Map.
 
 ### Backend (Express + Node.js)
-- **Server**: A lightweight Express server handles API requests and serves the static frontend.
-- **Storage Integration**: Handles presigned URL generation for secure uploads to Cloudflare R2.
-- **Environment**: Managed via `dotenv` for secure configuration.
+- **Server**: A lightweight Express server handles presigned URL generation for Cloudflare R2 uploads and is deployed on Vercel (not a standalone server).
+- **Note**: On mobile (Capacitor/Android), R2 uploads fall back to Firebase Storage because the Express server is not directly accessible from the native layer.
+- **Environment**: Managed via `dotenv` / Vercel environment variables for secure configuration.
 
 ### Database & Auth (Firebase)
 - **Firestore**: NoSQL database for storing user profiles, dream records, and global statistics.
@@ -27,7 +27,7 @@ The system is built on a modern, serverless-first architecture:
 - **Fallback**: Firebase Storage is configured as a secondary fallback for redundancy.
 
 ### AI Engine (Gemini)
-- **Transcription**: Gemini 3.1 Flash converts voice recordings into high-accuracy text.
+- **Transcription**: Gemini Flash converts voice recordings into high-accuracy text.
 - **Analysis**: Generates psychological insights, imagery tags, and the "Divine Oracle" sentences.
 
 ## 🔄 Data Flow
@@ -40,4 +40,4 @@ The system is built on a modern, serverless-first architecture:
 6. **Aggregate**: Global statistics are updated atomically via Firestore transactions.
 
 ---
-*Thoth Architecture v1.0.0*
+*Thoth Architecture v2.0.0 — Updated 2026-05-12*
