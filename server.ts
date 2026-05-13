@@ -291,10 +291,260 @@ async function startServer() {
       console.error('[WeChat] Query error:', err);
       res.status(500).json({ error: err.message });
     }
-  });
+  }
+}
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // R2 Upload
+// ─────────────────────────────────────────────────────────────────────────
+// Alipay — App Payment
+// Prerequisites: ALIPAY_APP_ID, ALIPAY_PRIVATE_KEY, ALIPAY_PUBLIC_KEY, ALIPAY_GATEWAY
+// ─────────────────────────────────────────────────────────────────────────
+
+const alipayAppId = process.env.ALIPAY_APP_ID ?? '';
+const alipayPrivateKey = process.env.ALIPAY_PRIVATE_KEY ?? '';
+const alipayPublicKey = process.env.ALIPAY_PUBLIC_KEY ?? '';
+const alipayGateway = process.env.ALIPAY_GATEWAY ?? 'https://openapi.alipay.com/gateway.do';
+const alipayNotifyUrl = process.env.ALIPAY_NOTIFY_URL ?? `${process.env.PAYMENT_SERVER_BASE_URL ?? 'https://api.thothapp.com'}/api/alipay/callback`;
+
+// Minimal in-memory Alipay order store (replace with DB in production)
+const alipayOrderStore = new Map<string, {
+  status: 'pending' | 'success' | 'failed' | 'cancelled';
+  transactionId?: string;
+  createdAt: number;
+}>();
+
+/**
+ * Helper: Build Alipay request parameters with RSA2 signature
+ */
+function buildAlipayRequestParams(method: string, bizContent: any): Record<string, string> {
+  const crypto = require('crypto');
+  const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+  const params: Record<string, string> = {
+    app_id: alipayAppId,
+    method,
+    format: 'JSON',
+    charset: 'utf-8',
+    sign_type: 'RSA2',
+    timestamp,
+    version: '1.0',
+    biz_content: JSON.stringify(bizContent),
+  };
+
+  // Add notify_url for app pay
+  if (method === 'alipay.trade.app.pay') {
+    params.notify_url = alipayNotifyUrl;
+  }
+
+  // Sort parameters alphabetically
+  const sortedKeys = Object.keys(params).sort();
+  let signStr = sortedKeys.map(key => `${key}=${params[key]}`).join('&');
+
+  // Sign with RSA2
+  const signer = crypto.createSign('RSA-SHA256');
+  signer.update(signStr);
+  const privateKeyPem = formatPrivateKey(alipayPrivateKey);
+  const sign = signer.sign(privateKeyPem, 'base64');
+
+  params.sign = sign;
+
+  return params;
+}
+
+/**
+ * Helper: Format private key to PEM format
+ */
+function formatPrivateKey(key: string): string {
+  if (!key.includes('-----BEGIN')) {
+    return `-----BEGIN PRIVATE KEY-----\n${key.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`;
+  }
+  return key;
+}
+
+/**
+ * Helper: Format public key to PEM format
+ */
+function formatPublicKey(key: string): string {
+  if (!key.includes('-----BEGIN')) {
+    return `-----BEGIN PUBLIC KEY-----\n${key.match(/.{1,64}/g)?.join('\n')}\n-----END PUBLIC KEY-----`;
+  }
+  return key;
+}
+
+/**
+ * Helper: Verify Alipay notification signature
+ */
+function verifyAlipayNotify(params: Record<string, string>): boolean {
+  const crypto = require('crypto');
+
+  // Extract sign and sign_type
+  const { sign, sign_type, ...restParams } = params;
+
+  // Sort parameters alphabetically
+  const sortedKeys = Object.keys(restParams).sort();
+  let signStr = sortedKeys.map(key => `${key}=${restParams[key]}`).join('&');
+
+  // Verify with RSA2
+  const verifier = crypto.createVerify('RSA-SHA256');
+  verifier.update(signStr);
+  const publicKeyPem = formatPublicKey(alipayPublicKey);
+
+  return verifier.verify(publicKeyPem, sign, 'base64');
+}
+
+/**
+ * POST /api/alipay/create-order
+ * Create an Alipay App payment order.
+ * Returns signed orderStr for Alipay SDK.
+ */
+app.post('/api/alipay/create-order', async (req, res) => {
+  try {
+    const { out_trade_no, total_amount, subject, attach = '' } = req.body;
+
+    if (!out_trade_no || !total_amount || !subject) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Build Alipay order parameters
+    const bizContent = {
+      out_trade_no,
+      total_amount: total_amount.toFixed(2),
+      subject,
+      body: attach,
+      product_code: 'QUICK_MSECURITY_PAY',
+    };
+
+    const params = buildAlipayRequestParams('alipay.trade.app.pay', bizContent);
+
+    // Build orderStr for SDK
+    const orderStr = Object.keys(params)
+      .sort()
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .join('&');
+
+    // Store order locally
+    alipayOrderStore.set(out_trade_no, {
+      status: 'pending',
+      createdAt: Date.now(),
+    });
+
+    return res.json({
+      orderStr,
+      outTradeNo: out_trade_no,
+    });
+  } catch (err: any) {
+    console.error('[Alipay] Create order error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/alipay/callback
+ * Alipay async payment notification.
+ * Respond with 'success' to acknowledge receipt.
+ */
+app.post('/api/alipay/callback', express.urlencoded({ extended: true }), async (req, res) => {
+  try {
+    const params = req.body as Record<string, string>;
+
+    // Verify signature
+    const isValid = verifyAlipayNotify(params);
+    if (!isValid) {
+      console.error('[Alipay] Invalid notification signature');
+      return res.send('fail');
+    }
+
+    const { out_trade_no, trade_status, trade_no } = params;
+
+    // Update order status
+    let status: 'pending' | 'success' | 'failed' | 'cancelled' = 'pending';
+    if (trade_status === 'TRADE_SUCCESS' || trade_status === 'TRADE_FINISHED') {
+      status = 'success';
+    } else if (trade_status === 'TRADE_CLOSED') {
+      status = 'cancelled';
+    }
+
+    if (alipayOrderStore.has(out_trade_no)) {
+      alipayOrderStore.get(out_trade_no)!.status = status;
+      alipayOrderStore.get(out_trade_no)!.transactionId = trade_no;
+    }
+
+    console.log(`[Alipay Callback] ${out_trade_no} → ${trade_status}`);
+    return res.send('success');
+  } catch (err: any) {
+    console.error('[Alipay] Callback error:', err);
+    res.send('fail');
+  }
+});
+
+/**
+ * GET /api/alipay/query-order
+ * Query Alipay order status (for client polling fallback).
+ */
+app.get('/api/alipay/query-order', async (req, res) => {
+  try {
+    const { out_trade_no } = req.query as { out_trade_no: string };
+
+    if (!out_trade_no) return res.status(400).json({ error: 'Missing out_trade_no' });
+
+    // Check local store first (fast)
+    const local = alipayOrderStore.get(out_trade_no);
+    if (local && local.status !== 'pending') {
+      return res.json({
+        outTradeNo: out_trade_no,
+        tradeState: local.status,
+        transactionId: local.transactionId ?? '',
+        tradeStateDesc: local.status,
+      });
+    }
+
+    // Fallback: Query Alipay directly
+    const bizContent = { out_trade_no };
+    const params = buildAlipayRequestParams('alipay.trade.query', bizContent);
+
+    const queryStr = Object.keys(params)
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .join('&');
+
+    const alipayRes = await fetch(`${alipayGateway}?${queryStr}`, {
+      method: 'GET',
+    });
+
+    const alipayData = await alipayRes.json();
+    const response = alipayData.alipay_trade_query_response;
+
+    if (response.code !== '10000') {
+      return res.status(404).json({ error: response.sub_msg || 'Order not found' });
+    }
+
+    let tradeState: 'pending' | 'success' | 'failed' | 'cancelled' = 'pending';
+    if (response.trade_status === 'TRADE_SUCCESS' || response.trade_status === 'TRADE_FINISHED') {
+      tradeState = 'success';
+    } else if (response.trade_status === 'TRADE_CLOSED') {
+      tradeState = 'cancelled';
+    } else {
+      tradeState = 'pending';
+    }
+
+    // Update local store
+    if (alipayOrderStore.has(out_trade_no)) {
+      alipayOrderStore.get(out_trade_no)!.status = tradeState;
+      alipayOrderStore.get(out_trade_no)!.transactionId = response.trade_no;
+    }
+
+    return res.json({
+      outTradeNo: out_trade_no,
+      tradeState,
+      transactionId: response.trade_no ?? '',
+      tradeStateDesc: response.trade_status ?? '',
+    });
+  } catch (err: any) {
+    console.error('[Alipay] Query error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// R2 Upload
   // ─────────────────────────────────────────────────────────────────────────
 
   // Get Presigned URL for R2 Upload

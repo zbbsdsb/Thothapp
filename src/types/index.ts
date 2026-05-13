@@ -82,24 +82,9 @@ export interface DreamAnalysis {
   divine_oracle: string;
 }
 
-// ── Payment (WeChat Pay) ─────────────────────────────────────
+// ── Payment (Common) ────────────────────────────────────────
 
 export type PaymentStatus = 'pending' | 'success' | 'failed' | 'cancelled';
-
-export interface CreateOrderParams {
-  amount: number;       // Amount in CNY *cents* (100 = ¥1.00)
-  title: string;       // Order title shown to user
-  outTradeNo: string;  // Client-generated unique order ID
-  attach?: string;     // Optional metadata (e.g. user_id)
-}
-
-export interface CreateOrderResponse {
-  prepayId: string;
-  nonceStr: string;
-  timestamp: string;
-  sign: string;
-  outTradeNo: string;
-}
 
 export interface PaymentResult {
   tradeState: PaymentStatus;
@@ -107,3 +92,42 @@ export interface PaymentResult {
   tradeStateDesc?: string;
   outTradeNo: string;
 }
+
+// ── Payment (WeChat Pay) ─────────────────────────────────────
+
+export interface CreateWeChatOrderParams {
+  amount: number;       // Amount in CNY *cents* (100 = ¥1.00)
+  title: string;       // Order title shown to user
+  outTradeNo: string;  // Client-generated unique order ID
+  attach?: string;     // Optional metadata (e.g. user_id)
+}
+
+export interface CreateWeChatOrderResponse {
+  prepayId: string;
+  nonceStr: string;
+  timestamp: string;
+  sign: string;
+  outTradeNo: string;
+}
+
+// Keep old exports for backward compatibility
+export type CreateOrderParams = CreateWeChatOrderParams;
+export type CreateOrderResponse = CreateWeChatOrderResponse;
+
+// ── Payment (Alipay) ────────────────────────────────────────
+
+export interface CreateAlipayOrderParams {
+  amount: number;       // Amount in CNY yuan (99.00 = ¥99.00)
+  title: string;       // Order title shown to user
+  outTradeNo: string;  // Client-generated unique order ID
+  attach?: string;     // Optional metadata (e.g. user_id)
+}
+
+export interface CreateAlipayOrderResponse {
+  orderStr: string;    // Signed order string for Alipay SDK
+  outTradeNo: string;
+}
+
+// Alipay resultStatus codes
+export type AlipayResultStatus = '9000' | '8000' | '6004' | '6001' | '6002' | '4000';
+

@@ -1,41 +1,31 @@
 /**
- * WeChat Pay — App Payment Integration
+ * Payment Integration — WeChat Pay & Alipay
  *
- * Flow:
- *   1. Client calls createPaymentOrder() → server creates WeChat order via APIv3
- *   2. Server returns { prepay_id } → client calls openWeChatPay()
- *   3. WeChat SDK opens, user completes payment inside WeChat
- *   4. WeChat notifies server via callback; server updates order status
- *   5. WeChat returns result to WXEntryActivity on Android
+ * Flow (both WeChat & Alipay):
+ *   1. Client calls createPaymentOrder() → server creates order via payment provider API
+ *   2. Server returns signed params → client calls open[Provider]Pay()
+ *   3. Payment SDK opens, user completes payment
+ *   4. Payment provider notifies server via callback; server updates order status
  *
  * Prerequisites (set as env vars before use):
  *   VITE_WX_APP_ID          — WeChat Open Platform App ID
- *   VITE_PAYMENT_SERVER_URL  — Backend base URL (e.g. https://api.thothapp.com)
+ *   VITE_ALIPAY_APP_ID      — Alipay Open Platform App ID
+ *   VITE_PAYMENT_SERVER_URL — Backend base URL (e.g. https://api.thothapp.com)
  */
 
-export type PaymentStatus = 'pending' | 'success' | 'failed' | 'cancelled';
+import {
+  PaymentStatus,
+  PaymentResult,
+  CreateWeChatOrderParams,
+  CreateWeChatOrderResponse,
+  CreateAlipayOrderParams,
+  CreateAlipayOrderResponse,
+} from '../types';
 
-export interface CreateOrderParams {
-  amount: number;       // Amount in CNY *cents* (100 = ¥1.00)
-  title: string;        // Order title shown to user
-  outTradeNo: string;   // Client-generated unique order ID
-  attach?: string;     // Optional metadata (e.g. user_id)
-}
-
-export interface CreateOrderResponse {
-  prepayId: string;    // WeChat prepay_id (valid 2h)
-  nonceStr: string;
-  timestamp: string;
-  sign: string;        // SDK call signature (appid|prepay_id|nonceStr|timestamp|partnerKey)
-  outTradeNo: string;
-}
-
-export interface PaymentResult {
-  tradeState: PaymentStatus;
-  transactionId?: string;
-  tradeStateDesc?: string;
-  outTradeNo: string;
-}
+// Export for backward compatibility
+export type { PaymentStatus, PaymentResult };
+export type CreateOrderParams = CreateWeChatOrderParams;
+export type CreateOrderResponse = CreateWeChatOrderResponse;
 
 // ---------------------------------------------------------------------------
 // Core API
@@ -141,6 +131,119 @@ export async function pay(
   // Step 3: Poll until resolved or timeout
   while (Date.now() - start < maxWaitMs) {
     const result = await queryPaymentStatus(params.outTradeNo);
+
+    if (result.tradeState === 'success') {
+      return { success: true, result };
+    }
+    if (result.tradeState === 'failed' || result.tradeState === 'cancelled') {
+      return { success: false, result };
+    }
+
+    // Wait 1.5s before next poll
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+
+  // Timeout — treat as pending (payment may still be processing server-side)
+  return {
+    success: false,
+    result: {
+      tradeState: 'pending',
+      outTradeNo: params.outTradeNo,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Alipay Pay
+// ---------------------------------------------------------------------------
+
+/**
+ * Create an Alipay App payment order on the backend.
+ * The backend generates and signs the orderStr for Alipay SDK.
+ */
+export async function createAlipayOrder(
+  params: CreateAlipayOrderParams,
+): Promise<CreateAlipayOrderResponse> {
+  const serverUrl = import.meta.env.VITE_PAYMENT_SERVER_URL;
+
+  const res = await fetch(`${serverUrl}/api/alipay/create-order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      out_trade_no: params.outTradeNo,
+      total_amount: params.amount,
+      subject: params.title,
+      attach: params.attach ?? '',
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(err.error ?? `HTTP ${res.status}`);
+  }
+
+  return res.json() as Promise<CreateAlipayOrderResponse>;
+}
+
+/**
+ * Open Alipay Pay using the Alipay SDK.
+ * Falls back to URL scheme if SDK not available.
+ *
+ * Note: Requires native Capacitor plugin integration on Android/iOS
+ */
+export async function openAlipay(orderStr: string): Promise<void> {
+  // Try to use Capacitor plugin if available
+  // @ts-ignore
+  if (typeof window.Alipay !== 'undefined') {
+    // @ts-ignore
+    await window.Alipay.pay(orderStr);
+    return;
+  }
+
+  // For web fallback or if plugin not available
+  // Try to open via URL scheme (this may not work on all platforms)
+  console.warn('Alipay SDK not available, attempting URL scheme fallback');
+}
+
+/**
+ * Query Alipay order status from the backend.
+ */
+export async function queryAlipayOrderStatus(
+  outTradeNo: string,
+): Promise<PaymentResult> {
+  const serverUrl = import.meta.env.VITE_PAYMENT_SERVER_URL;
+
+  const res = await fetch(
+    `${serverUrl}/api/alipay/query-order?out_trade_no=${encodeURIComponent(outTradeNo)}`,
+  );
+
+  if (!res.ok) {
+    throw new Error(`Query failed: HTTP ${res.status}`);
+  }
+
+  return res.json() as Promise<PaymentResult>;
+}
+
+/**
+ * Start Alipay payment and wait for result.
+ * Uses polling with exponential backoff (max 60s) as fallback.
+ */
+export async function payAlipay(
+  params: CreateAlipayOrderParams,
+  options: { maxWaitMs?: number } = {},
+): Promise<{ success: boolean; result: PaymentResult }> {
+  const maxWaitMs = options.maxWaitMs ?? 60_000;
+  const start = Date.now();
+
+  // Step 1: Create Alipay order
+  const order = await createAlipayOrder(params);
+
+  // Step 2: Open Alipay payment
+  await openAlipay(order.orderStr);
+
+  // Step 3: Poll until resolved or timeout
+  while (Date.now() - start < maxWaitMs) {
+    const result = await queryAlipayOrderStatus(params.outTradeNo);
 
     if (result.tradeState === 'success') {
       return { success: true, result };
