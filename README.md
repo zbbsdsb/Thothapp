@@ -4,6 +4,11 @@ Thoth is a real-time, collaborative dream archiving platform. It visualizes the 
 
 Available on **Web**, **Android**, and **iOS** via Capacitor.
 
+## 🌍 社区
+
+- [GitHub Discussions](https://github.com/[用户名]/Thothapp/discussions) - 加入社区讨论
+- [Discord](https://discord.gg/[邀请码]) - 实时交流和支持
+
 ## Features
 
 - **Voice-to-Dream**: Real-time transcription of dream narratives using Gemini API
@@ -141,6 +146,19 @@ npx cap open ios     # Open in Xcode
 - Build release APK/AAB via Android Studio
 - Sign with upload key (configured in `android/app/thoth-upload-key.jks`)
 - Publish to Google Play Store
+
+## 🌟 Get Help
+
+需要帮助？我们有多种方式可以支持你：
+
+- **GitHub Discussions Q&A**: [点击这里](https://github.com/[用户名]/Thothapp/discussions/categories/q-a) 提问和回答问题
+- **Discord 社区**: [加入我们的 Discord](https://discord.gg/[邀请码]) 与其他用户和开发者实时交流
+- **文档**: [查看项目文档](docs/README.md) 了解更多信息
+- **Bug 报告**: 如果发现问题，请 [提交 Issue](https://github.com/[用户名]/Thothapp/issues/new/choose)
+
+## 🤝 Contributing
+
+我们欢迎所有形式的贡献！查看 [Good First Issues](.github/GOOD_FIRST_ISSUES.md) 开始你的贡献之旅。
 
 ## License
 

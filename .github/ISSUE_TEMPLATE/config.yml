@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔥 功能讨论
+    url: https://github.com/[用户名]/Thothapp/discussions/categories/ideas
+    about: 在 Discussions 中提出新功能想法并与社区讨论
+  - name: ❓ 寻求帮助
+    url: https://github.com/[用户名]/Thothapp/discussions/categories/q-a
+    about: 在 Q&A 分类中寻求使用帮助
+  - name: 💬 社区闲聊
+    url: https://github.com/[用户名]/Thothapp/discussions/categories/general
+    about: 与社区成员进行一般讨论
+  - name: 🎮 Discord 社区
+    url: https://discord.gg/[邀请码]
+    about: 加入我们的 Discord 服务器进行实时交流
