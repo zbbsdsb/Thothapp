@@ -198,8 +198,8 @@ private fun UploadingContent() {
         modifier = Modifier.padding(8.dp)
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(48.dp),
-            indicatorColor = Color(0xFF6C63FF)
+            progress = { 0f },
+            modifier = Modifier.size(48.dp)
         )
 
         Spacer(modifier = Modifier.height(12.dp))
