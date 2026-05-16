@@ -16,8 +16,6 @@ const config: CapacitorConfig = {
     backgroundColor: '#0a0a0f',
     // Custom User-Agent for server-side identification
     overrideUserAgent: 'ThothApp/Android',
-    // Use HTTPS scheme for the web view
-    androidScheme: 'https',
   },
   plugins: {
     SplashScreen: {

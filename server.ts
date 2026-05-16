@@ -117,7 +117,7 @@ const ALLOWED_CONTENT_TYPES = new Set([
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = parseInt(process.env.PORT || '3000', 10);
 
   app.use(cors({
     origin: (origin, callback) => {

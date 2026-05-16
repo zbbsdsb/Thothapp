@@ -1,12 +1,11 @@
 import { motion } from 'motion/react';
-import { Mic2, History, Globe, Settings, User, BookOpen } from 'lucide-react';
+import { Mic2, History, Globe, Settings, User as UserIcon, BookOpen } from 'lucide-react';
 import { ThothLogo } from './Logo';
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, User } from 'firebase/auth';
 import { auth } from '../firebase';
-import type { FirebaseUser } from 'firebase/auth';
 
 interface NavigationProps {
-  user: FirebaseUser | null;
+  user: User | null;
   activeTab: string;
   onTabChange: (tab: 'record' | 'history' | 'global' | 'settings' | 'docs') => void;
 }

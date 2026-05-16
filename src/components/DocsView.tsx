@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Logo } from './Logo'
+import { ThothLogo } from './Logo'
 import { TabBar } from './TabBar'
 
 interface DocMetadata {
@@ -10,7 +10,12 @@ interface DocMetadata {
   category: 'features' | 'specs' | 'guides'
 }
 
-export function DocsView() {
+interface DocsViewProps {
+  activeTab: string
+  onTabChange: (tab: 'record' | 'history' | 'global' | 'settings' | 'docs') => void
+}
+
+export function DocsView({ activeTab, onTabChange }: DocsViewProps) {
   const [docs, setDocs] = useState<DocMetadata[]>([])
   const [selectedDoc, setSelectedDoc] = useState<DocMetadata | null>(null)
   const [docContent, setDocContent] = useState('')
@@ -49,7 +54,7 @@ export function DocsView() {
     <div className="docs-container">
       <header className="p-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <Logo />
+          <ThothLogo />
           <h1 className="text-2xl font-bold">Documentation</h1>
         </div>
       </header>
@@ -89,11 +94,52 @@ export function DocsView() {
             ) : (
               <>
                 {activeCategory === 'all' ? (
-              <>
-                {groupedDocs.guides.length > 0 && (
-                  <div className="docs-group">
-                  <h3>Guides</h3>
-                  {groupedDocs.guides.map(doc => (
+                  <>
+                    {groupedDocs.guides.length > 0 && (
+                      <div className="docs-group">
+                        <h3>Guides</h3>
+                        {groupedDocs.guides.map(doc => (
+                          <button
+                            key={doc.id}
+                            onClick={() => setSelectedDoc(doc)}
+                            className={selectedDoc?.id === doc.id ? 'active' : ''}
+                          >
+                            {doc.title}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {groupedDocs.features.length > 0 && (
+                      <div className="docs-group">
+                        <h3>Features</h3>
+                        {groupedDocs.features.map(doc => (
+                          <button
+                            key={doc.id}
+                            onClick={() => setSelectedDoc(doc)}
+                            className={selectedDoc?.id === doc.id ? 'active' : ''}
+                          >
+                            {doc.title}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {groupedDocs.specs.length > 0 && (
+                      <div className="docs-group">
+                        <h3>Specs</h3>
+                        {groupedDocs.specs.map(doc => (
+                          <button
+                            key={doc.id}
+                            onClick={() => setSelectedDoc(doc)}
+                            className={selectedDoc?.id === doc.id ? 'active' : ''}
+                          >
+                            {doc.title}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  docs.filter(doc => doc.category === activeCategory).map(doc => (
                     <button
                       key={doc.id}
                       onClick={() => setSelectedDoc(doc)}
@@ -101,48 +147,9 @@ export function DocsView() {
                     >
                       {doc.title}
                     </button>
-                  ))}
-                  </div>
-                )}
-                {groupedDocs.features.length > 0 && (
-                  <div className="docs-group">
-                  <h3>Features</h3>
-                  {groupedDocs.features.map(doc => (
-                    <button
-                      key={doc.id}
-                      onClick={() => setSelectedDoc(doc)}
-                      className={selectedDoc?.id === doc.id ? 'active' : ''}
-                    >
-                      {doc.title}
-                    </button>
-                  ))}
-                  </div>
-                )}
-                {groupedDocs.specs.length > 0 && (
-                  <div className="docs-group">
-                  <h3>Specs</h3>
-                  {groupedDocs.specs.map(doc => (
-                    <button
-                      key={doc.id}
-                      onClick={() => setSelectedDoc(doc)}
-                      className={selectedDoc?.id === doc.id ? 'active' : ''}
-                    >
-                      {doc.title}
-                    </button>
-                  ))}
-                  </div>
+                  ))
                 )}
               </>
-            ) : (
-              docs.filter(doc => doc.category === activeCategory).map(doc => (
-                <button
-                  key={doc.id}
-                  onClick={() => setSelectedDoc(doc)}
-                  className={selectedDoc?.id === doc.id ? 'active' : ''}
-                >
-                  {doc.title}
-                </button>
-              ))
             )}
           </div>
         </aside>
@@ -163,7 +170,7 @@ export function DocsView() {
         </main>
       </div>
 
-      <TabBar activeTab="docs" />
+      <TabBar activeTab={activeTab} onTabChange={onTabChange} />
     </div>
   )
 }

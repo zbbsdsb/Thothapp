@@ -9,7 +9,7 @@ import {
   serverTimestamp,
   Timestamp
 } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../firebase';
 import { Dream, DreamCreate, OperationType } from '../index';
 import { handleFirestoreError } from '../utils/error';
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { Clock, Moon } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
@@ -33,13 +33,13 @@ export default function App() {
   const [userCountry, setUserCountry] = useState<string | null>(null);
 
   // Fetch user country on mount
-  useState(() => {
+  useEffect(() => {
     if (!user) return;
     fetch('https://ipapi.co/json/')
       .then((r) => r.json())
       .then((d) => setUserCountry(d.country_name || 'Unknown'))
       .catch(() => setUserCountry('Unknown'));
-  });
+  }, [user]);
 
   // Countdown — active only on record tab
   const {
@@ -101,7 +101,7 @@ export default function App() {
   }
 
   if (activeTab === 'docs') {
-    return <DocsView />;
+    return <DocsView activeTab={activeTab} onTabChange={setActiveTab} />;
   }
 
   return (

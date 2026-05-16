@@ -4,7 +4,7 @@ import {
   increment,
   serverTimestamp
 } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../firebase';
 import { OperationType } from '../index';
 import { handleFirestoreError } from '../utils/error';
 

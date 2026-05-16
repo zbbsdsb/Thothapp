@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { User, Zap, Moon, LogOut } from 'lucide-react';
-import { signOut as firebaseSignOut } from 'firebase/auth';
+import { User as UserIcon, Zap, Moon, LogOut } from 'lucide-react';
+import { signOut as firebaseSignOut, User } from 'firebase/auth';
 import { updateDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
-import type { FirebaseUser } from 'firebase/auth';
 import type { UserProfile } from '../types';
 
 interface SettingsViewProps {
-  user: FirebaseUser;
+  user: User;
   profile: UserProfile;
 }
 
@@ -56,7 +55,7 @@ export function SettingsView({ user, profile }: SettingsViewProps) {
         {/* Identity Stats */}
         <div className="glass-card p-8 sm:p-12">
           <h3 className="text-xs sm:text-sm font-bold uppercase tracking-[0.3em] mb-8 sm:mb-10 flex items-center gap-4 text-white/60">
-            <User className="w-4 h-4 sm:w-5 h-5 text-dream-accent" />
+            <UserIcon className="w-4 h-4 sm:w-5 h-5 text-dream-accent" />
             Dreamer Identity
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">

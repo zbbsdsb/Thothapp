@@ -14,7 +14,7 @@ import {
 import { auth, db } from '../firebase';
 import type { UserProfile } from '../types';
 
-const DEFAULT_PROFILE: Omit<UserProfile, 'created_at' | 'email'> & {
+const DEFAULT_PROFILE: Omit<UserProfile, 'created_at'> & {
   created_at: Timestamp;
 } = {
   email: '',

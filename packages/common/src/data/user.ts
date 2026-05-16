@@ -6,7 +6,7 @@ import {
   increment,
   runTransaction
 } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../firebase';
 import { UserProfile, OperationType } from '../index';
 import { handleFirestoreError } from '../utils/error';
 
