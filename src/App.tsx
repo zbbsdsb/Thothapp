@@ -50,13 +50,19 @@ export default function App() {
     format: formatCountdown,
   } = useCountdown(activeTab === 'record');
 
-  // Recording
+  // Recording - refresh data when dream is added
+  const handleDreamAdded = useCallback(() => {
+    // Trigger any necessary UI updates after dream is added
+    console.log('Dream added successfully');
+  }, []);
+
   const { isRecording, isTranscribing, startRecording, stopRecording } = useRecording({
     userId: user?.uid,
     profile,
     userCountry,
-    hasUserKey: !!profile?.external_apis?.minimax,
-    onDreamAdded: () => {},
+    // 检查用户是否有自己的 Gemini key
+    hasUserKey: !!profile?.external_apis?.gemini,
+    onDreamAdded: handleDreamAdded,
     addDream,
   });
 

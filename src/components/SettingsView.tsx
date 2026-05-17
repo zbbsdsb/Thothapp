@@ -20,7 +20,7 @@ export function SettingsView({ user, profile }: SettingsViewProps) {
     exit: { opacity: 0, y: -20 },
   };
 
-  const hasUserKey = !!profile.external_apis?.minimax;
+  const hasUserKey = !!profile.external_apis?.gemini;
   const remainingQuota = Math.max(0, profile.daily_quota_limit - profile.daily_usage_count);
   const memberSince = profile.created_at?.toDate().toLocaleDateString('en-US', {
     month: 'short',
@@ -29,7 +29,7 @@ export function SettingsView({ user, profile }: SettingsViewProps) {
 
   const handleKeyChange = async (value: string) => {
     await updateDoc(doc(db, 'users', user.uid), {
-      'external_apis.minimax': value,
+      'external_apis.gemini': value,
     });
   };
 
@@ -87,14 +87,14 @@ export function SettingsView({ user, profile }: SettingsViewProps) {
             <div className="space-y-4">
               <div className="flex justify-between items-end">
                 <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">
-                  Minimax API Key
+                  Gemini API Key
                 </label>
                 <span className="text-[9px] text-white/20 italic">Optional: Removes public quota</span>
               </div>
               <input
                 type="password"
                 placeholder="Enter your private key..."
-                defaultValue={profile.external_apis?.minimax || ''}
+                defaultValue={profile.external_apis?.gemini || ''}
                 onChange={(e) => handleKeyChange(e.target.value)}
                 className="w-full bg-white/[0.03] border border-white/5 rounded-2xl py-5 px-6 focus:border-dream-accent/50 outline-none transition-all font-mono text-sm"
               />

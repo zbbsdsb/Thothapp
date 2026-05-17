@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const COLLAPSE_SECONDS = 180; // 3 minutes
 
@@ -6,6 +6,12 @@ export function useCountdown(isActive: boolean) {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [isDreamLost, setIsDreamLost] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countdownRef = useRef(countdown);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    countdownRef.current = countdown;
+  }, [countdown]);
 
   useEffect(() => {
     if (isActive && countdown === null && !isDreamLost) {
@@ -14,13 +20,19 @@ export function useCountdown(isActive: boolean) {
   }, [isActive, countdown, isDreamLost]);
 
   useEffect(() => {
-    if (countdown !== null && countdown > 0) {
+    if (countdown !== null && countdown > 0 && !timerRef.current) {
+      // Only create interval once
       timerRef.current = setInterval(() => {
-        setCountdown((prev) => (prev !== null ? prev - 1 : null));
+        const next = countdownRef.current! - 1;
+        if (next <= 0) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          timerRef.current = null;
+          setCountdown(0);
+          setIsDreamLost(true);
+        } else {
+          setCountdown(next);
+        }
       }, 1000);
-    } else if (countdown === 0) {
-      setIsDreamLost(true);
-      if (timerRef.current) clearInterval(timerRef.current);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);

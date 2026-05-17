@@ -50,17 +50,19 @@ export function RecordView({
   const [manualText, setManualText] = useState('');
   const [isWatchMode, setIsWatchMode] = useState(false);
   const [hasWokenUp, setHasWokenUp] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const { addDream } = useDreamActions(userId, profile);
 
   const handleManualSave = async () => {
     if (!manualText.trim()) return;
     onCancelCountdown();
+    setIsAnalyzing(true);
 
     const today = new Date().toISOString().split('T')[0];
     const isNewDay = profile.last_usage_date !== today;
     const currentUsage = isNewDay ? 0 : profile.daily_usage_count;
-    const hasUserKey = !!profile.external_apis?.minimax;
+    const hasUserKey = !!profile.external_apis?.gemini;
     const isUsingPublicQuota = !hasUserKey;
 
     if (isUsingPublicQuota && currentUsage >= profile.daily_quota_limit) {
@@ -69,7 +71,8 @@ export function RecordView({
     }
 
     isTranscribing; // prevent unused warning
-    const apiKey = profile.external_apis?.minimax || (import.meta.env.VITE_GEMINI_API_KEY as string);
+    // 使用用户自己的 Gemini key，或 fallback 到公共 key
+    const apiKey = profile.external_apis?.gemini || (import.meta.env.VITE_GEMINI_API_KEY as string);
 
     let tags: string[] = [];
     let insight = 'Subconscious patterns detected.';
@@ -97,6 +100,8 @@ export function RecordView({
       onDreamAdded();
     } catch {
       toast.error('Failed to save dream.');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -302,15 +307,15 @@ export function RecordView({
             <div className="flex justify-between items-center mt-8 pt-8 border-t border-white/5">
               <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/20 font-bold">
                 <Info className="w-3 h-3" />
-                AI Analysis will be applied
+                {isAnalyzing ? 'AI is analyzing...' : 'AI Analysis will be applied'}
               </div>
               <button
                 onClick={handleManualSave}
-                disabled={isTranscribing || !manualText.trim()}
+                disabled={isAnalyzing || !manualText.trim()}
                 className="group flex items-center gap-3 px-10 py-4 bg-white text-black font-bold uppercase tracking-[0.2em] text-xs rounded-2xl disabled:opacity-50 transition-all hover:bg-dream-accent hover:text-white"
               >
-                Archive
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                {isAnalyzing ? 'Analyzing...' : 'Archive'}
+                {!isAnalyzing && <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />}
               </button>
             </div>
           </motion.div>

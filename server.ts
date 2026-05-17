@@ -426,11 +426,12 @@ async function startServer() {
   const alipayNotifyUrl = process.env.ALIPAY_NOTIFY_URL ?? `${process.env.PAYMENT_SERVER_BASE_URL ?? 'https://api.thothapp.com'}/api/alipay/callback`;
 
   // Minimal in-memory Alipay order store (replace with DB in production)
-  const alipayOrderStore = new Map<string, {
+  interface AlipayOrder {
     status: 'pending' | 'success' | 'failed' | 'cancelled';
     transactionId?: string;
     createdAt: number;
-  }>();
+  }
+  const alipayOrderStore = new Map<string, AlipayOrder>();
 
   /**
    * Helper: Build Alipay request parameters with RSA2 signature

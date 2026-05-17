@@ -41,7 +41,7 @@ export function HistoryView({ userId, profile, onSelectDream }: HistoryViewProps
     },
   };
 
-  const isToday = profile.last_usage_date !== new Date().toISOString().split('T')[0];
+  const hasUnrecordedDream = profile.last_usage_date !== new Date().toISOString().split('T')[0];
 
   return (
     <motion.div
@@ -52,7 +52,7 @@ export function HistoryView({ userId, profile, onSelectDream }: HistoryViewProps
       className="space-y-10 sm:space-y-16"
     >
       {/* Unrecorded Night Alert */}
-      {isToday && dreams.length > 0 && (
+      {hasUnrecordedDream && dreams.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

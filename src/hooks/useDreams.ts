@@ -69,15 +69,17 @@ export function useDreams(userId: string | undefined) {
     const q = collection(db, 'users');
     const unsub = onSnapshot(
       q,
-      (snap) => setTotalUserCount(snap.size),
+      (snap) => {
+        setTotalUserCount(snap.size);
+        // Only set loading to false after all data is loaded
+        if (userId) {
+          setLoading(false);
+        }
+      },
       (err) => handleFirestoreError(err, OperationType.LIST, 'users')
     );
     return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    setLoading(false);
-  }, []);
+  }, [userId]);
 
   return { dreams, globalImagery, globalLocations, totalUserCount, loading };
 }
@@ -107,7 +109,7 @@ export function useDreamActions(userId: string | undefined, profile: UserProfile
       const today = new Date().toISOString().split('T')[0];
       const isNewDay = profile.last_usage_date !== today;
       const currentUsage = isNewDay ? 0 : profile.daily_usage_count;
-      const hasUserKey = !!profile.external_apis?.minimax;
+      const hasUserKey = !!profile.external_apis?.gemini;
       const isUsingPublicQuota = !hasUserKey;
 
       if (isUsingPublicQuota && currentUsage >= profile.daily_quota_limit) {

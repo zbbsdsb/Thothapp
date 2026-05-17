@@ -63,7 +63,7 @@ export function useRecording({
 
   const processRecording = useCallback(
     async (audioBlob: Blob, mimeType: string) => {
-      if (!userId || !profile) return;
+      if (!userId || !profile || !addDream) return;
 
       const today = new Date().toISOString().split('T')[0];
       const isNewDay = profile.last_usage_date !== today;
@@ -76,33 +76,35 @@ export function useRecording({
       }
 
       setIsTranscribing(true);
-      const apiKey = profile.external_apis?.minimax || import.meta.env.VITE_GEMINI_API_KEY as string;
+      // 使用用户自己的 Gemini key，或 fallback 到公共 key
+      const apiKey = profile.external_apis?.gemini || import.meta.env.VITE_GEMINI_API_KEY as string;
 
       try {
-        const dreamId = Math.random().toString(36).substring(7);
+        // First, add dream to Firestore to get the document ID
+        const tempId = Math.random().toString(36).substring(7);
         const audioUrl = await uploadAudio(
           audioBlob,
-          buildAudioFileName(userId, dreamId),
+          buildAudioFileName(userId, tempId),
           mimeType
         );
         const base64Audio = await audioToBase64(audioBlob);
         const transcript = await transcribeAudio(apiKey, base64Audio, mimeType);
         const { tags, insight, divine_oracle } = await analyzeDream(apiKey, transcript);
 
-        if (addDream) {
-          await addDream({
-            transcript,
-            audio_url: audioUrl,
-            tags,
-            insight,
-            divine_oracle,
-            location: userCountry || 'Unknown',
-          });
-        }
+        // Add to Firestore (this will generate the real document ID)
+        const dreamId = await addDream({
+          transcript,
+          audio_url: audioUrl,
+          tags,
+          insight,
+          divine_oracle,
+          location: userCountry || 'Unknown',
+        });
 
         onDreamAdded?.();
         toast.success('Dream archived successfully.');
       } catch (err) {
+        console.error('Recording processing error:', err);
         if (err instanceof Error && !err.message.includes('Firestore Error')) {
           toast.error('Failed to process dream.');
         }

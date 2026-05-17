@@ -6,21 +6,22 @@ export function handleFirestoreError(
   operationType: OperationType,
   path: string | null
 ): never {
+  const currentUser = auth.currentUser;
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData.map((p) => ({
+    authInfo: currentUser ? {
+      userId: currentUser.uid,
+      email: currentUser.email,
+      emailVerified: currentUser.emailVerified,
+      isAnonymous: currentUser.isAnonymous,
+      tenantId: currentUser.tenantId,
+      providerInfo: currentUser.providerData.map((p) => ({
         providerId: p.providerId,
         displayName: p.displayName,
         email: p.email,
         photoUrl: p.photoURL,
       })),
-    },
+    } : undefined,
     operationType,
     path,
   };
