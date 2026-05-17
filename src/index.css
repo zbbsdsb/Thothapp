@@ -52,6 +52,7 @@
 
 .docs-container {
   @apply min-h-screen flex flex-col;
+  background: linear-gradient(180deg, #0a0502 0%, #0f0a05 100%);
 }
 
 .docs-layout {
@@ -59,7 +60,8 @@
 }
 
 .docs-sidebar {
-  @apply w-64 border-r border-white/10 bg-zinc-900/50 flex flex-col;
+  @apply w-72 border-r border-white/10 bg-black/30 flex flex-col;
+  backdrop-filter: blur(20px);
 }
 
 .category-tabs {
@@ -67,11 +69,11 @@
 }
 
 .category-tabs button {
-  @apply px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-all;
+  @apply flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all;
 }
 
 .category-tabs button.active {
-  @apply text-white bg-white/10 font-medium;
+  @apply text-white bg-gradient-to-r from-dream-accent/20 to-transparent border-l-2 border-dream-accent font-medium;
 }
 
 .docs-list {
@@ -79,81 +81,180 @@
 }
 
 .docs-group {
-  @apply space-y-2;
+  @apply space-y-1;
 }
 
 .docs-group h3 {
-  @apply text-xs font-semibold text-zinc-500 uppercase tracking-wider;
+  @apply flex items-center gap-2 text-xs font-semibold uppercase tracking-wider mb-3 px-2;
 }
 
 .docs-list button {
-  @apply w-full text-left px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-all block;
+  @apply relative w-full text-left px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all flex items-center gap-2;
 }
 
 .docs-list button.active {
-  @apply text-white bg-white/10 font-medium;
+  @apply text-white bg-dream-accent/10 border border-dream-accent/20;
+}
+
+.docs-list button:hover {
+  @apply text-white;
+}
+
+.docs-list button svg:last-child {
+  @apply ml-auto opacity-0 transition-all;
+}
+
+.docs-list button:hover svg:last-child {
+  @apply opacity-100;
 }
 
 .docs-main {
   @apply flex-1 overflow-y-auto p-8 md:p-12;
 }
 
-.doc-content {
-  @apply max-w-3xl mx-auto;
+/* Loading state */
+.loading {
+  @apply flex items-center justify-center gap-3 text-zinc-500 py-8;
 }
 
-.doc-content h2 {
-  @apply text-3xl font-bold mb-3;
+/* Doc header card */
+.doc-header-card {
+  @apply p-8 rounded-3xl bg-gradient-to-br from-white/5 to-white/2 border border-white/10 backdrop-blur-xl;
+  box-shadow: 0 0 60px rgba(255, 78, 0, 0.1);
 }
 
-.doc-content h3 {
-  @apply text-2xl font-semibold mt-8 mb-3;
+/* Prose custom styles */
+.prose-custom {
+  @apply text-zinc-300 leading-relaxed;
 }
 
-.doc-content h4 {
-  @apply text-xl font-semibold mt-6 mb-2;
+.prose-custom h1 {
+  @apply text-4xl font-serif italic mb-6 mt-12 bg-clip-text text-transparent bg-gradient-to-r from-white to-zinc-400;
 }
 
-.doc-content .doc-description {
-  @apply text-zinc-400 mb-8;
+.prose-custom h2 {
+  @apply text-2xl font-semibold mb-4 mt-10 text-white flex items-center gap-3;
 }
 
-.doc-content p {
-  @apply mb-4 leading-relaxed;
+.prose-custom h2::before {
+  content: '';
+  @apply w-1 h-6 bg-gradient-to-b from-dream-accent to-amber-500 rounded-full;
 }
 
-.doc-content ul, .doc-content ol {
-  @apply ml-6 mb-4 space-y-2;
+.prose-custom h3 {
+  @apply text-xl font-semibold mt-8 mb-3 text-zinc-200;
 }
 
-.doc-content li {
-  @apply list-disc;
+.prose-custom h4 {
+  @apply text-lg font-medium mt-6 mb-2 text-zinc-300;
 }
 
-.doc-content pre {
-  @apply bg-zinc-900/80 p-4 rounded-xl my-4 overflow-x-auto text-sm;
+.prose-custom p {
+  @apply mb-5 leading-relaxed;
 }
 
-.doc-content code {
-  @apply font-mono text-sm bg-white/5 px-1.5 py-0.5 rounded;
+.prose-custom ul, .prose-custom ol {
+  @apply ml-6 mb-5 space-y-2;
 }
 
-.doc-content pre code {
-  @apply bg-transparent p-0;
+.prose-custom ul {
+  @apply list-none;
 }
 
-.doc-content table {
-  @apply w-full my-6 border-collapse;
+.prose-custom ul li {
+  @apply relative pl-6;
 }
 
-.doc-content th, .doc-content td {
-  @apply border border-white/10 px-4 py-2 text-left;
+.prose-custom ul li::before {
+  content: '';
+  @apply absolute left-0 top-2.5 w-2 h-2 bg-dream-accent/50 rounded-full;
 }
 
-.doc-content th {
-  @apply bg-white/5 font-medium;
+.prose-custom ol {
+  @apply list-decimal;
 }
 
+.prose-custom ol li {
+  @apply pl-2;
+}
+
+.prose-custom code {
+  @apply font-mono text-sm bg-white/5 px-2 py-1 rounded-lg text-dream-accent/80;
+}
+
+.prose-custom pre {
+  @apply bg-zinc-900/80 p-6 rounded-2xl my-6 overflow-x-auto text-sm border border-white/5;
+}
+
+.prose-custom pre code {
+  @apply bg-transparent p-0 text-zinc-300;
+}
+
+.prose-custom blockquote {
+  @apply border-l-4 border-dream-accent/50 pl-6 py-2 my-6 bg-white/5 rounded-r-xl italic text-zinc-400;
+}
+
+.prose-custom table {
+  @apply w-full my-6 border-collapse rounded-xl overflow-hidden;
+}
+
+.prose-custom th {
+  @apply bg-white/10 font-medium px-6 py-4 text-left text-zinc-200;
+}
+
+.prose-custom td {
+  @apply border-t border-white/5 px-6 py-4;
+}
+
+.prose-custom tr:hover td {
+  @apply bg-white/5;
+}
+
+.prose-custom a {
+  @apply text-dream-accent hover:underline;
+}
+
+.prose-custom hr {
+  @apply border-white/10 my-8;
+}
+
+/* Doc placeholder */
 .doc-placeholder {
-  @apply flex flex-col items-center justify-center h-full text-center text-zinc-500;
+  @apply flex flex-col items-center justify-center h-full text-center;
+}
+
+.doc-placeholder .placeholder-icon {
+  @apply w-32 h-32 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-8;
+  @apply text-zinc-500;
+}
+
+.doc-placeholder h3 {
+  @apply text-2xl font-serif italic mb-2 text-white;
+}
+
+.doc-placeholder p {
+  @apply text-zinc-500 mb-12;
+}
+
+/* Quick links */
+.quick-links {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl;
+}
+
+.quick-link-card {
+  @apply flex flex-col p-6 rounded-2xl bg-white/5 border border-white/10 text-left transition-all;
+  @apply hover:border-dream-accent/30 hover:bg-white/10;
+  @apply text-zinc-300;
+}
+
+.quick-link-card h4 {
+  @apply text-lg font-medium mt-3 mb-2 text-white;
+}
+
+.quick-link-card p {
+  @apply text-sm text-zinc-500 mb-4 flex-1;
+}
+
+.quick-link-card svg {
+  @apply text-dream-accent/50;
 }

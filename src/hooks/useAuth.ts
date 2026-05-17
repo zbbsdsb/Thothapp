@@ -12,6 +12,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { SCREENSOT_MODE } from '../config';
 import type { UserProfile } from '../types';
 
 const DEFAULT_PROFILE: Omit<UserProfile, 'created_at'> & {
@@ -31,7 +32,8 @@ const DEFAULT_PROFILE: Omit<UserProfile, 'created_at'> & {
 
 // SCREENSHOT MODE: Set to true to bypass Firebase auth for screenshots
 // Set to 'demo' to show demo authenticated state with mock data
-const SCREENSHOT_MODE: false | 'unauthenticated' | 'demo' = 'demo';
+// Set to 'unauthenticated' to show the login screen (for testing the login UI)
+export const SCREENSHOT_MODE: false | 'unauthenticated' | 'demo' = 'demo';
 
 export function useAuth() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -43,7 +45,13 @@ export function useAuth() {
     if (SCREENSHOT_MODE) {
       if (SCREENSHOT_MODE === 'demo') {
         // Simulate authenticated user with demo profile
-        setUser({} as FirebaseUser); // Mock user object
+        // Mock Firebase user with required properties
+        const mockUser = {
+          uid: 'demo-user-123',
+          email: 'demo@thoth.app',
+          displayName: 'Demo User',
+        } as unknown as FirebaseUser;
+        setUser(mockUser);
         setProfile({
           email: 'demo@thoth.app',
           created_at: Timestamp.now(),

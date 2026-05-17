@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   collection,
   query,
@@ -19,6 +19,34 @@ import { OperationType } from '../types';
 import { syncUserStats, updateGlobalImagery, updateGlobalLocation } from '../lib/firestore';
 import type { Dream, GlobalImagery, GlobalLocation, UserProfile } from '../types';
 
+// HARDCODED: Demo mode is on (because Screenshot_MODE import is broken)
+const IS_DEMO_MODE = true;
+
+const MOCK_DREAMS: Dream[] = [
+  {
+    id: 'demo-dream-1',
+    user_id: 'demo-user-123',
+    transcript: 'I was flying over a beautiful ocean at sunset, the colors were incredible.',
+    audio_url: '',
+    tags: ['flying', 'ocean', 'sunset'],
+    insight: 'This dream suggests a desire for freedom and perspective.',
+    divine_oracle: 'The oracle speaks of transformation and new beginnings.',
+    location: 'Unknown',
+    created_at: { toDate: () => new Date() } as any,
+  },
+  {
+    id: 'demo-dream-2',
+    user_id: 'demo-user-123',
+    transcript: 'I found a hidden library with books that contained my memories.',
+    audio_url: '',
+    tags: ['library', 'books', 'memories'],
+    insight: 'A dream about self-discovery and accessing inner wisdom.',
+    divine_oracle: 'The oracle whispers of knowledge waiting to be unlocked.',
+    location: 'Unknown',
+    created_at: { toDate: () => new Date(Date.now() - 86400000) } as any,
+  },
+];
+
 export function useDreams(userId: string | undefined) {
   const [dreams, setDreams] = useState<Dream[]>([]);
   const [globalImagery, setGlobalImagery] = useState<GlobalImagery[]>([]);
@@ -26,9 +54,34 @@ export function useDreams(userId: string | undefined) {
   const [totalUserCount, setTotalUserCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // User's dream list
+  // In demo mode, use mock data and skip Firestore
   useEffect(() => {
-    if (!userId) return;
+    if (IS_DEMO_MODE) {
+      setDreams(MOCK_DREAMS);
+      setGlobalImagery([
+        { tag: 'flying', count: 42 },
+        { tag: 'water', count: 38 },
+        { tag: 'chase', count: 27 },
+      ]);
+      setGlobalLocations([
+        { location: 'New York', count: 156 },
+        { location: 'London', count: 98 },
+        { location: 'Tokyo', count: 87 },
+      ]);
+      setTotalUserCount(1234);
+      setLoading(false);
+      return;
+    }
+  }, []);
+
+  // Function to remove dream from state (used in demo mode)
+  const removeDreamFromState = (dreamId: string) => {
+    setDreams(prev => prev.filter(d => d.id !== dreamId));
+  };
+
+  // User's dream list (skip in demo mode)
+  useEffect(() => {
+    if (IS_DEMO_MODE || !userId) return;
     const q = query(
       collection(db, 'dreams'),
       where('user_id', '==', userId),
@@ -42,8 +95,9 @@ export function useDreams(userId: string | undefined) {
     return () => unsub();
   }, [userId]);
 
-  // Global imagery
+  // Global imagery (skip in demo mode)
   useEffect(() => {
+    if (IS_DEMO_MODE) return;
     const q = query(collection(db, 'global_imagery'), orderBy('count', 'desc'), limit(30));
     const unsub = onSnapshot(
       q,
@@ -53,8 +107,9 @@ export function useDreams(userId: string | undefined) {
     return () => unsub();
   }, []);
 
-  // Global locations
+  // Global locations (skip in demo mode)
   useEffect(() => {
+    if (IS_DEMO_MODE) return;
     const q = query(collection(db, 'global_locations'), orderBy('count', 'desc'));
     const unsub = onSnapshot(
       q,
@@ -64,8 +119,9 @@ export function useDreams(userId: string | undefined) {
     return () => unsub();
   }, []);
 
-  // Total registered users
+  // Total registered users (skip in demo mode)
   useEffect(() => {
+    if (IS_DEMO_MODE) return;
     const q = collection(db, 'users');
     const unsub = onSnapshot(
       q,
@@ -81,12 +137,11 @@ export function useDreams(userId: string | undefined) {
     return () => unsub();
   }, [userId]);
 
-  return { dreams, globalImagery, globalLocations, totalUserCount, loading };
+  return { dreams, globalImagery, globalLocations, totalUserCount, loading, removeDreamFromState };
 }
 
 export function useDreamActions(userId: string | undefined, profile: UserProfile | null) {
-  const deleteDream = useCallback(
-    async (dreamId: string, location: string, tags: string[]) => {
+  const deleteDream = async (dreamId: string, location: string, tags: string[]) => {
       if (!userId) return;
       try {
         await deleteDoc(doc(db, 'dreams', dreamId));
@@ -99,12 +154,9 @@ export function useDreamActions(userId: string | undefined, profile: UserProfile
         }
         throw err;
       }
-    },
-    [userId]
-  );
+    };
 
-  const addDream = useCallback(
-    async (fields: Omit<Dream, 'id' | 'user_id' | 'created_at'>) => {
+  const addDream = async (fields: Omit<Dream, 'id' | 'user_id' | 'created_at'>) => {
       if (!userId || !profile) return;
       const today = new Date().toISOString().split('T')[0];
       const isNewDay = profile.last_usage_date !== today;
@@ -129,9 +181,7 @@ export function useDreamActions(userId: string | undefined, profile: UserProfile
       ]);
 
       return dreamRef.id;
-    },
-    [userId, profile]
-  );
+    };
 
   return { deleteDream, addDream };
 }

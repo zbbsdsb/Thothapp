@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { toast } from 'sonner';
 import { uploadAudio, buildAudioFileName, audioToBase64 } from '../lib/storage';
 import { transcribeAudio, analyzeDream } from '../lib/ai';
@@ -29,7 +29,7 @@ export function useRecording({
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
-  const startRecording = useCallback(async () => {
+  const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/wav';
@@ -51,18 +51,17 @@ export function useRecording({
     } catch {
       toast.error('Microphone access denied.');
     }
-  }, [onRecordingStart]);
+  };
 
-  const stopRecording = useCallback(() => {
+  const stopRecording = () => {
     if (mediaRecorder.current && isRecording) {
       mediaRecorder.current.stop();
       setIsRecording(false);
       mediaRecorder.current.stream.getTracks().forEach((t) => t.stop());
     }
-  }, [isRecording]);
+  };
 
-  const processRecording = useCallback(
-    async (audioBlob: Blob, mimeType: string) => {
+  const processRecording = async (audioBlob: Blob, mimeType: string) => {
       if (!userId || !profile || !addDream) return;
 
       const today = new Date().toISOString().split('T')[0];
@@ -111,9 +110,7 @@ export function useRecording({
       } finally {
         setIsTranscribing(false);
       }
-    },
-    [userId, profile, hasUserKey, onDreamAdded, addDream, userCountry]
-  );
+  };
 
   return {
     isRecording,

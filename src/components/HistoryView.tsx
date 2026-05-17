@@ -14,11 +14,11 @@ interface HistoryViewProps {
   userId: string;
   profile: UserProfile;
   onSelectDream: (dream: Dream | null) => void;
+  onDeleteClick?: (dream: Dream) => void;
 }
 
-export function HistoryView({ userId, profile, onSelectDream }: HistoryViewProps) {
+export function HistoryView({ userId, profile, onSelectDream, onDeleteClick }: HistoryViewProps) {
   const { dreams } = useDreams(userId);
-  const { deleteDream } = useDreamActions(userId, profile);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const filteredDreams = useMemo(() => {
@@ -121,7 +121,7 @@ export function HistoryView({ userId, profile, onSelectDream }: HistoryViewProps
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  deleteDream(dream.id, dream.location, dream.tags);
+                  onDeleteClick?.(dream);
                 }}
                 className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all"
               >

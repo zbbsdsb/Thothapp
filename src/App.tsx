@@ -18,13 +18,15 @@ import { DocsView } from './components/DocsView';
 import { DreamDetailModal } from './components/DreamDetailModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 
+import { SCREENSOT_MODE } from './config';
+
 import type { Dream } from './types';
 
 type Tab = 'record' | 'history' | 'global' | 'settings' | 'docs';
 
 export default function App() {
   const { user, profile, loading } = useAuth();
-  const { dreams } = useDreams(user?.uid);
+  const { dreams, removeDreamFromState } = useDreams(user?.uid);
   const { deleteDream, addDream } = useDreamActions(user?.uid, profile);
 
   const [activeTab, setActiveTab] = useState<Tab>('record');
@@ -51,10 +53,10 @@ export default function App() {
   } = useCountdown(activeTab === 'record');
 
   // Recording - refresh data when dream is added
-  const handleDreamAdded = useCallback(() => {
+  const handleDreamAdded = () => {
     // Trigger any necessary UI updates after dream is added
     console.log('Dream added successfully');
-  }, []);
+  };
 
   const { isRecording, isTranscribing, startRecording, stopRecording } = useRecording({
     userId: user?.uid,
@@ -70,8 +72,14 @@ export default function App() {
   const handleDeleteConfirm = async () => {
     if (!dreamToDelete || !user) return;
     try {
-      await deleteDream(dreamToDelete.id, dreamToDelete.location, dreamToDelete.tags);
-      toast.success('Dream deleted successfully.');
+      if (SCREENSOT_MODE === 'demo') {
+        // In demo mode, remove from state only
+        removeDreamFromState?.(dreamToDelete.id);
+        toast.success('Dream deleted successfully.');
+      } else {
+        await deleteDream(dreamToDelete.id, dreamToDelete.location, dreamToDelete.tags);
+        toast.success('Dream deleted successfully.');
+      }
     } catch {
       toast.error('Failed to delete dream.');
     } finally {
@@ -142,6 +150,7 @@ export default function App() {
               userId={user.uid}
               profile={profile!}
               onSelectDream={setSelectedDream}
+              onDeleteClick={setDreamToDelete}
             />
           )}
           {activeTab === 'global' && <GlobalView userId={user.uid} />}
@@ -189,10 +198,12 @@ export default function App() {
 
       {/* Modals */}
       <DreamDetailModal dream={selectedDream} onClose={() => setSelectedDream(null)} />
-      <DeleteConfirmModal
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setDreamToDelete(null)}
-      />
+      {dreamToDelete && (
+        <DeleteConfirmModal
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setDreamToDelete(null)}
+        />
+      )}
     </div>
   );
 }
