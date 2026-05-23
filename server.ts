@@ -665,6 +665,358 @@ async function startServer() {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Google Play Billing — Server-Side Verification & RTDN
+  // Prerequisites: GOOGLE_PLAY_SERVICE_ACCOUNT_JSON, GOOGLE_PLAY_PACKAGE_NAME
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const googlePlayPackageName = process.env.GOOGLE_PLAY_PACKAGE_NAME ?? 'com.thoth.dreamarchive';
+  let googlePlayServiceAccount: any = null;
+
+  /**
+   * Initialize Google Play Developer API service account credentials.
+   * Called lazily on first API request.
+   */
+  async function getGooglePlayCredentials(): Promise<any> {
+    if (googlePlayServiceAccount) return googlePlayServiceAccount;
+
+    const keyPath = process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON;
+    if (!keyPath) {
+      throw new Error('GOOGLE_PLAY_SERVICE_ACCOUNT_JSON environment variable is not set');
+    }
+
+    try {
+      const { readFileSync } = await import('fs');
+      const { GoogleAuth } = await import('google-auth-library');
+      const keyFile = JSON.parse(readFileSync(keyPath, 'utf8'));
+
+      const auth = new GoogleAuth({
+        credentials: {
+          client_email: keyFile.client_email,
+          private_key: keyFile.private_key,
+        },
+        scopes: ['https://www.googleapis.com/auth/androidpublisher'],
+      });
+
+      googlePlayServiceAccount = auth;
+      return auth;
+    } catch (err) {
+      console.error('[Google Play] Failed to initialize credentials:', err);
+      throw new Error('Failed to initialize Google Play API credentials');
+    }
+  }
+
+  /**
+   * Call the Google Play Developer API.
+   */
+  async function callPlayDeveloperApi(path: string, method: string = 'GET', body?: any): Promise<any> {
+    const auth = await getGooglePlayCredentials();
+    const client = await auth.getClient();
+    const token = await client.getAccessToken();
+
+    const url = `https://www.googleapis.com/androidpublisher/v3/applications/${googlePlayPackageName}${path}`;
+
+    const options: RequestInit = {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    };
+
+    if (body && method !== 'GET') {
+      options.body = JSON.stringify(body);
+    }
+
+    const res = await fetch(url, options);
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error(`[Google Play] API error ${res.status}:`, data);
+      throw new Error(data.error?.message ?? `Google Play API error: ${res.status}`);
+    }
+
+    return data;
+  }
+
+  /**
+   * POST /api/google-play/verify
+   * Verify a purchase token via Google Play Developer API.
+   * Updates Firestore user profile with subscription tier.
+   */
+  app.post('/api/google-play/verify', async (req, res) => {
+    try {
+      const { purchaseToken, productId, orderId, userId } = req.body;
+
+      if (!purchaseToken || !productId || !userId) {
+        return res.status(400).json({ error: 'Missing required fields: purchaseToken, productId, userId' });
+      }
+
+      // Determine if this is a subscription or one-time product
+      const isSubscription = productId.includes('premium');
+
+      if (isSubscription) {
+        // Verify subscription via purchases.subscriptionsv2.get
+        const purchase = await callPlayDeveloperApi(
+          `/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}`
+        );
+
+        // Verify purchase state
+        if (purchase.purchaseState !== 0) {
+          return res.status(400).json({
+            error: 'Purchase not completed',
+            purchaseState: purchase.purchaseState,
+          });
+        }
+
+        // Verify package name
+        if (purchase.packageName !== googlePlayPackageName) {
+          return res.status(400).json({ error: 'Package name mismatch' });
+        }
+
+        // Check subscription state
+        const subscriptionState = purchase.subscriptionState;
+        const isActive = ['SUBSCRIPTION_STATE_ACTIVE', 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD'].includes(subscriptionState);
+
+        if (!isActive) {
+          return res.json({
+            verified: false,
+            tier: 'free',
+            subscriptionState,
+          });
+        }
+
+        // Acknowledge the purchase if not already acknowledged
+        if (purchase.acknowledgementState !== 1) {
+          await callPlayDeveloperApi(
+            `/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}:acknowledge`,
+            'POST'
+          );
+        }
+
+        // Calculate expiry from line items
+        const expiryDate = purchase.lineItems?.[0]?.expiryTime
+          ? new Date(purchase.lineItems[0].expiryTime).toISOString()
+          : null;
+
+        // TODO: Update Firestore user profile with subscription tier
+        // await updateUserSubscription(userId, {
+        //   tier: 'premium',
+        //   planId: productId,
+        //   expiryDate,
+        //   autoRenewing: purchase.autoResumeTime != null,
+        //   purchaseToken,
+        // });
+
+        console.log(`[Google Play] Verified subscription: ${userId} → ${productId}`);
+
+        return res.json({
+          verified: true,
+          tier: 'premium',
+          planId: productId,
+          expiryDate,
+          autoRenewing: true,
+          subscriptionState,
+        });
+      } else {
+        // Verify one-time product via purchases.products.get
+        const purchase = await callPlayDeveloperApi(
+          `/purchases/products/tokens/${encodeURIComponent(purchaseToken)}`
+        );
+
+        if (purchase.purchaseState !== 0) {
+          return res.status(400).json({
+            error: 'Purchase not completed',
+            purchaseState: purchase.purchaseState,
+          });
+        }
+
+        if (purchase.packageName !== googlePlayPackageName) {
+          return res.status(400).json({ error: 'Package name mismatch' });
+        }
+
+        // Acknowledge if needed
+        if (purchase.acknowledgementState !== 1) {
+          await callPlayDeveloperApi(
+            `/purchases/products/tokens/${encodeURIComponent(purchaseToken)}:acknowledge`,
+            'POST'
+          );
+        }
+
+        console.log(`[Google Play] Verified one-time purchase: ${userId} → ${productId}`);
+
+        return res.json({
+          verified: true,
+          productId,
+          purchaseState: purchase.purchaseState,
+        });
+      }
+    } catch (err: any) {
+      console.error('[Google Play] Verify error:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /**
+   * POST /api/google-play/consume
+   * Consume a one-time purchase and add credits to the user's balance.
+   */
+  app.post('/api/google-play/consume', async (req, res) => {
+    try {
+      const { purchaseToken, productId, orderId, userId } = req.body;
+
+      if (!purchaseToken || !productId || !userId) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Verify the purchase first
+      const purchase = await callPlayDeveloperApi(
+        `/purchases/products/tokens/${encodeURIComponent(purchaseToken)}`
+      );
+
+      if (purchase.purchaseState !== 0) {
+        return res.status(400).json({ error: 'Purchase not completed' });
+      }
+
+      if (purchase.consumptionState === 1) {
+        return res.status(400).json({ error: 'Purchase already consumed' });
+      }
+
+      // Consume the purchase via Play Developer API
+      await callPlayDeveloperApi(
+        `/purchases/products/tokens/${encodeURIComponent(purchaseToken)}:consume`,
+        'POST'
+      );
+
+      // Determine credits to add based on product ID
+      let creditsToAdd = 0;
+      if (productId === 'thoth_credits_10') creditsToAdd = 10;
+      else if (productId === 'thoth_credits_50') creditsToAdd = 50;
+
+      // TODO: Update Firestore user credits_balance
+      // const newBalance = await addUserCredits(userId, creditsToAdd);
+
+      console.log(`[Google Play] Consumed purchase: ${userId} → ${productId} (+${creditsToAdd} credits)`);
+
+      return res.json({
+        verified: true,
+        creditsAdded: creditsToAdd,
+        // newBalance, // Uncomment when Firestore integration is ready
+      });
+    } catch (err: any) {
+      console.error('[Google Play] Consume error:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /**
+   * GET /api/google-play/subscription-status
+   * Query the current subscription status for a user.
+   */
+  app.get('/api/google-play/subscription-status', async (req, res) => {
+    try {
+      const { userId } = req.query as { userId: string };
+
+      if (!userId) {
+        return res.status(400).json({ error: 'Missing userId' });
+      }
+
+      // TODO: Read from Firestore
+      // const userProfile = await getUserProfile(userId);
+      // if (userProfile.subscription_tier === 'premium' && !isExpired(userProfile)) {
+      //   return res.json({ tier: 'premium', planId: userProfile.subscription_plan_id, ... });
+      // }
+
+      // Placeholder response until Firestore integration
+      return res.json({
+        tier: 'free',
+        planId: null,
+        expiryDate: null,
+        autoRenewing: false,
+      });
+    } catch (err: any) {
+      console.error('[Google Play] Subscription status error:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /**
+   * POST /api/google-play/rtdn
+   * Real-Time Developer Notification webhook from Google Cloud Pub/Sub.
+   * Receives subscription state change notifications.
+   */
+  app.post('/api/google-play/rtdn', express.raw({ type: 'application/json' }), async (req, res) => {
+    try {
+      const body = (req as any).body?.toString() ?? '';
+      const message = JSON.parse(body);
+      const pubsubMessage = message.message;
+
+      if (!pubsubMessage?.data) {
+        console.warn('[Google Play RTDN] Empty message data');
+        return res.status(200).send('OK');
+      }
+
+      // Decode base64 data
+      const decodedData = Buffer.from(pubsubMessage.data, 'base64').toString('utf8');
+      const notification = JSON.parse(decodedData);
+
+      const { notificationType, purchaseToken, subscriptionId } = notification;
+
+      console.log(`[Google Play RTDN] ${notificationType} for ${subscriptionId ?? purchaseToken}`);
+
+      // Fetch full purchase details from Play Developer API
+      if (purchaseToken) {
+        try {
+          const purchase = await callPlayDeveloperApi(
+            `/purchases/subscriptionsv2/tokens/${encodeURIComponent(purchaseToken)}`
+          );
+
+          // TODO: Update Firestore based on notification type
+          switch (notificationType) {
+            case 1: // SUBSCRIPTION_PURCHASED
+              console.log(`[Google Play RTDN] Subscription purchased: ${subscriptionId}`);
+              break;
+            case 2: // SUBSCRIPTION_RENEWED
+              console.log(`[Google Play RTDN] Subscription renewed: ${subscriptionId}`);
+              break;
+            case 3: // SUBSCRIPTION_IN_GRACE_PERIOD
+              console.log(`[Google Play RTDN] Subscription in grace period: ${subscriptionId}`);
+              break;
+            case 4: // SUBSCRIPTION_ON_HOLD
+              console.log(`[Google Play RTDN] Subscription on hold: ${subscriptionId}`);
+              break;
+            case 5: // SUBSCRIPTION_REVOKED
+              console.log(`[Google Play RTDN] Subscription revoked: ${subscriptionId}`);
+              break;
+            case 6: // SUBSCRIPTION_EXPIRED
+              console.log(`[Google Play RTDN] Subscription expired: ${subscriptionId}`);
+              break;
+            case 13: // SUBSCRIPTION_PAUSED
+              console.log(`[Google Play RTDN] Subscription paused: ${subscriptionId}`);
+              break;
+            case 14: // SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED
+              console.log(`[Google Play RTDN] Pause schedule changed: ${subscriptionId}`);
+              break;
+            case 15: // SUBSCRIPTION_RESTARTED
+              console.log(`[Google Play RTDN] Subscription restarted: ${subscriptionId}`);
+              break;
+            default:
+              console.log(`[Google Play RTDN] Unknown notification type: ${notificationType}`);
+          }
+        } catch (apiErr) {
+          console.error(`[Google Play RTDN] Failed to fetch purchase details:`, apiErr);
+        }
+      }
+
+      // Always return 200 to acknowledge receipt
+      return res.status(200).send('OK');
+    } catch (err: any) {
+      console.error('[Google Play RTDN] Error:', err);
+      // Still return 200 to prevent retry spam
+      return res.status(200).send('OK');
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
   // R2 Upload
   // ─────────────────────────────────────────────────────────────────────────
 

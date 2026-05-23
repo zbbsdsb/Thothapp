@@ -36,6 +36,10 @@
 # ==================== Crashlytics (if added later) ====================
 -keepattributes *Annotation*
 
+# ==================== Google Play Billing ====================
+-keep class com.android.vending.billing.** { *; }
+-keep class com.android.billingclient.** { *; }
+
 # ==================== General ====================
 # Preserve line numbers for debugging
 -keepattributes SourceFile,LineNumberTable

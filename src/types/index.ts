@@ -131,3 +131,27 @@ export interface CreateAlipayOrderResponse {
 // Alipay resultStatus codes
 export type AlipayResultStatus = '9000' | '8000' | '6004' | '6001' | '6002' | '4000';
 
+// ── Google Play Billing ──────────────────────────────────────
+
+export type SubscriptionTier = 'free' | 'premium' | 'enterprise';
+
+export interface SubscriptionStatus {
+  tier: SubscriptionTier;
+  planId: string;
+  expiryDate: string | null;
+  autoRenewing: boolean;
+  gracePeriodEndsAt: string | null;
+  accountHold: boolean;
+  paused: boolean;
+}
+
+export interface GooglePlayPurchaseRecord {
+  userId: string;
+  purchaseToken: string;
+  productId: string;
+  orderId: string;
+  purchaseTime: number;
+  verified: boolean;
+  acknowledged: boolean;
+}
+
