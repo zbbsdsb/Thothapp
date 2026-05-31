@@ -2,13 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'org.jetbrains.kotlin.plugin.compose'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     namespace = "com.thoth.dreamarchive.wear"
     compileSdk rootProject.ext.wearCompileSdkVersion
 
     defaultConfig {
-        applicationId "com.thoth.dreamarchive.wear"
+        applicationId "oasis.thoth.wear"
         minSdk rootProject.ext.wearMinSdkVersion
         targetSdk rootProject.ext.wearTargetSdkVersion
         versionCode 1
@@ -41,6 +42,12 @@ android {
 }
 
 dependencies {
+    // Firebase BoM (required to initialize Firebase in this app module)
+    implementation platform("com.google.firebase:firebase-bom:${rootProject.ext.firebaseBomVersion}")
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-storage-ktx'
+
     // Wear Compose (no separate BOM - use explicit versions)
     implementation "androidx.wear.compose:compose-material3:1.0.0-alpha23"
     implementation "androidx.wear.compose:compose-navigation:1.3.1"
