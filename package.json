@@ -1,8 +1,35 @@
 {
   "name": "thoth",
+  "version": "1.1.0",
+  "description": "Thoth - The Global Dream Archive. A real-time, collaborative dream archiving platform with AI-powered transcription and analysis.",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "author": "Thoth Team",
+  "license": "Apache-2.0",
+  "homepage": "https://thoth.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/Thothapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/Thothapp/issues"
+  },
+  "keywords": [
+    "dream",
+    "archive",
+    "ai",
+    "transcription",
+    "react",
+    "capacitor",
+    "firebase",
+    "gemini",
+    "cross-platform",
+    "pwa"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
@@ -11,7 +38,11 @@
     "clean": "rm -rf dist",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "jest",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "android:build": "npm run build && npx cap sync android",
+    "android:open": "npx cap open android",
+    "ios:build": "npm run build && npx cap sync ios",
+    "ios:open": "npx cap open ios"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1023.0",

@@ -1,20 +1,26 @@
 ---
-name: Documentation Improvement
-about: 建议改进文档或添加新文档
+name: Documentation
+about: Report documentation issues or suggest improvements
 title: "[DOCS] "
-labels: documentation, needs-triage
+labels: documentation
 assignees: ''
 
 ---
 
-## 📖 文档问题描述
-清晰简洁地描述文档中存在的问题或需要改进的地方。
+## 📚 Documentation Issue
+Describe the documentation issue or improvement you'd like to suggest.
 
-## 🎯 期望的改进
-清晰简洁地描述你希望看到的改进。
+## 🔗 Affected Page/section
+Provide a link or describe the location of the documentation in question.
 
-## 🔗 相关链接
-如果适用，添加指向相关文档页面的链接。
+## 📝 Current State
+Describe the current state of the documentation (if reporting an issue).
 
-## 📝 其他信息
-在这里添加任何其他信息、截图或建议。
+## ✅ Suggested Improvement
+Describe how the documentation could be improved.
+
+## 📸 Screenshots
+If applicable, add screenshots to help explain the issue.
+
+## 📝 Additional Context
+Add any other context about the documentation request here.

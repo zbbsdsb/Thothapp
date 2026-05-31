@@ -1,23 +1,30 @@
 ---
 name: Feature Request
-about: 提出新功能或改进建议
+about: Suggest a new feature or improvement for Thoth
 title: "[FEATURE] "
 labels: enhancement, needs-triage
 assignees: ''
 
 ---
 
-## ✨ 功能描述
-清晰简洁地描述你想要的功能是什么。
+## ✨ Feature Description
+A clear and concise description of the feature you'd like to see.
 
-## 🎯 这个功能解决了什么问题？
-清晰简洁地描述这个功能解决了什么问题。例如：我总是在想 [...]
+## 🎯 Problem Statement
+Describe the problem this feature would solve. Ex. I'm always frustrated when [...]
 
-## 💡 你想要的解决方案
-清晰简洁地描述你想要发生的事情。
+## 💡 Proposed Solution
+A clear and concise description of what you want to happen.
 
-## 🔄 你考虑过的替代方案
-清晰简洁地描述你考虑过的任何替代解决方案或功能。
+## 🔄 Alternatives Considered
+A clear and concise description of any alternative solutions or features you've considered.
 
-## 📝 其他信息
-在这里添加关于功能请求的任何其他信息或截图。
+## 📸 Mockups / Examples
+If applicable, add mockups, screenshots, or examples from other applications to help illustrate your request.
+
+## 📝 Additional Context
+Add any other context, use cases, or screenshots about the feature request here.
+
+## 🔗 Related Issues
+Link to any related issues or discussions (if applicable):
+- Related to #...

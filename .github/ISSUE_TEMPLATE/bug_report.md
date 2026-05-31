@@ -7,27 +7,32 @@ assignees: ''
 
 ---
 
-## 🔍 描述 Bug
-清晰简洁地描述这个 bug 是什么。
+## 🔍 Describe the Bug
+A clear and concise description of what the bug is.
 
-## 🚶 复现步骤
-复现行为的步骤：
-1. 进入 '...' 页面
-2. 点击 '...'
-3. 滚动到 '...'
-4. 查看错误
+## 🚶 Steps to Reproduce
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '...'
+3. Scroll down to '...'
+4. See error
 
-## ✅ 预期行为
-清晰简洁地描述你期望发生的事情。
+## ✅ Expected Behavior
+A clear and concise description of what you expected to happen.
 
-## 📸 截图/录屏
-如果可以，添加屏幕截图或录屏来帮助解释你的问题。
+## 📸 Screenshots / Recordings
+If applicable, add screenshots or screen recordings to help explain your problem.
 
-## 📱 环境信息
- - 设备：[例如 iPhone 15, 小米 14, 桌面端]
- - 操作系统：[例如 iOS 17.4, Android 14, Windows 11]
- - 浏览器：[例如 Chrome 124, Safari 17, Firefox 125]
- - Thoth 版本：[例如 1.0.0]
+## 📱 Environment
+- **Device:** [e.g., iPhone 15, Samsung Galaxy S24, Desktop]
+- **OS:** [e.g., iOS 17.4, Android 14, Windows 11, macOS 14]
+- **Browser:** [e.g., Chrome 124, Safari 17, Firefox 125]
+- **Thoth Version:** [e.g., 1.0.0]
+- **App Type:** [Web, Android, iOS]
 
-## 📝 其他信息
-在这里添加关于问题的任何其他信息。
+## 📝 Additional Context
+Add any other context about the problem here.
+
+## 🔗 Related Issues
+Link to any related issues (if applicable):
+- Related to #...

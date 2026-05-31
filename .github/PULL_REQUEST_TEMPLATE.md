@@ -1,28 +1,60 @@
-# 描述
-请清晰简洁地描述这个 PR 做了什么修改。
+## 📝 Description
+Please provide a clear and concise description of the changes in this PR.
 
-## 相关 Issue
-请链接到相关的 Issue（如果有的话）：
-- Closes #（Issue 编号）
+## 🔗 Related Issues
+Link to related issues (if applicable):
+- Closes # (issue number)
+- Related to # (issue number)
 
-## 变更类型
-请删除不相关的选项：
-- 🐛 Bug 修复（非破坏性更改，修复了一个问题）
-- ✨ 新功能（非破坏性更改，添加了一个功能）
-- 💔 破坏性更改（修复或功能会导致现有功能无法正常工作）
-- 📚 文档更新
+## 🔄 Type of Change
+Please delete options that are not relevant:
 
-## 测试
-请描述你是如何测试这些变更的：
-- [ ] 我已经在本地测试了我的代码
-- [ ] 我已经添加了必要的测试用例
-- [ ] 所有现有测试都通过了
+- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
+- [ ] ✨ New feature (non-breaking change which adds functionality)
+- [ ] 💔 Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 📚 Documentation update
+- [ ] 🎨 UI/UX improvement
+- [ ] ⚡ Performance improvement
+- [ ] 🔧 Code refactoring
+- [ ] ✅ Test addition or update
 
-## 截图（如果适用）
-如果适用，请添加屏幕截图来帮助解释你的变更。
+## 🧪 Testing
+Please describe the tests that you ran to verify your changes:
 
-## 清单
-- [ ] 我的代码遵循了这个项目的代码风格
-- [ ] 我已经对我的代码进行了自我审查
-- [ ] 我已经对我的代码进行了注释，特别是在难以理解的区域
-- [ ] 我的变更不会产生新的警告
+- [ ] I have tested my code locally
+- [ ] I have added unit tests for new functionality
+- [ ] I have added E2E tests (if applicable)
+- [ ] All existing tests pass
+
+### Test Configuration
+- **OS:** [e.g., Windows 11, macOS 14, Ubuntu 22.04]
+- **Node Version:** [e.g., 18.17.0]
+- **Browser:** [e.g., Chrome 124, Safari 17]
+
+## 📸 Screenshots / Recordings
+If applicable, add screenshots or screen recordings to help explain your changes.
+
+## ✅ Checklist
+- [ ] My code follows the project's style guidelines
+- [ ] I have performed a self-review of my code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+- [ ] Any dependent changes have been merged and published
+
+## 🌍 Platform Testing
+If your changes affect specific platforms, please indicate which ones you've tested:
+
+- [ ] Web (Desktop)
+- [ ] Web (Mobile)
+- [ ] Android
+- [ ] iOS
+
+## 📋 Additional Notes
+Add any other notes or context about the PR here.
+
+## 👥 Reviewers
+Tag reviewers who should look at this PR:
+@reviewer1 @reviewer2

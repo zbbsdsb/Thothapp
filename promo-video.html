@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +29,6 @@
       overflow: hidden;
     }
 
-    /* Video Container - YouTube 16:9 */
     .video-container {
       width: 1920px;
       height: 1080px;
@@ -38,7 +37,6 @@
       overflow: hidden;
     }
 
-    /* Step 1: Particle Canvas */
     #particleCanvas {
       position: absolute;
       inset: 0;
@@ -46,7 +44,6 @@
       pointer-events: none;
     }
 
-    /* Background Atmosphere */
     .atmosphere {
       position: absolute;
       inset: 0;
@@ -69,7 +66,6 @@
       100% { transform: scale(1) translate(-1%, 1%) rotate(-1deg); }
     }
 
-    /* Step 4: Vignette Overlay */
     .vignette {
       position: absolute;
       inset: 0;
@@ -78,7 +74,6 @@
       background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
     }
 
-    /* Step 4: Film Grain */
     .film-grain {
       position: absolute;
       inset: -50%;
@@ -100,7 +95,6 @@
       100% { transform: translate(0, 0); }
     }
 
-    /* Scene Base */
     .scene {
       position: absolute;
       inset: 0;
@@ -119,7 +113,6 @@
       pointer-events: auto;
     }
 
-    /* Step 2: Scene Transition Classes */
     .scene.exit-fade-zoom {
       animation: exitFadeZoom 0.8s ease forwards;
     }
@@ -216,24 +209,6 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    .scene.exit-fade-black {
-      animation: exitFadeBlack 0.8s ease forwards;
-    }
-    .scene.enter-fade-black {
-      animation: enterFadeBlack 0.8s ease forwards;
-    }
-
-    @keyframes exitFadeBlack {
-      0% { opacity: 1; }
-      40% { opacity: 0.3; }
-      100% { opacity: 0; }
-    }
-    @keyframes enterFadeBlack {
-      0% { opacity: 0; }
-      60% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
-
     .scene.exit-slow-dissolve {
       animation: exitSlowDissolve 1.2s ease forwards;
     }
@@ -250,7 +225,6 @@
       to { opacity: 1; }
     }
 
-    /* Typography */
     .title-serif {
       font-family: var(--font-serif);
       font-style: italic;
@@ -268,10 +242,15 @@
       color: var(--dream-accent);
     }
 
-    /* Scene 1: Opening (0-3s) */
-    .scene-opening .logo-container {
-      text-align: center;
-      animation: fadeInScale 1s ease-out;
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .moon-icon {
@@ -287,7 +266,6 @@
       filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.5));
     }
 
-    /* Step 5: Moon Glow Ring */
     .moon-icon::after {
       content: '';
       position: absolute;
@@ -307,71 +285,62 @@
       100% { width: 200px; height: 200px; opacity: 0; border-color: rgba(255, 255, 255, 0); }
     }
 
-    .scene-opening h1 {
-      font-size: 80px;
-      letter-spacing: 0.1em;
-      margin-bottom: 20px;
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(255, 78, 0, 0.4); }
+      50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(255, 78, 0, 0.6); }
     }
 
-    /* Step 3: Letter-by-letter stagger for "Thoth" */
-    .scene-opening h1 .letter {
-      display: inline-block;
-      opacity: 0;
-      animation: letterFadeIn 0.6s ease forwards;
+    @keyframes recordWave {
+      0% { inset: -10px; opacity: 0.6; }
+      100% { inset: -40px; opacity: 0; }
     }
 
-    @keyframes letterFadeIn {
-      from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
-      to { opacity: 1; transform: translateY(0); filter: blur(0); }
-    }
-
-    .scene-opening .subtitle {
-      font-size: 18px;
-      text-transform: uppercase;
-      letter-spacing: 0.3em;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
+    @keyframes pulseDot {
+      0%, 100% {
         transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(255, 78, 0, 0.7);
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+        box-shadow: 0 0 0 20px rgba(255, 78, 0, 0);
       }
     }
 
-    /* Scene 2: Problem (3-8s) */
+    @keyframes drawLine {
+      0% { stroke-dashoffset: 300; opacity: 0; }
+      20% { opacity: 0.6; }
+      80% { opacity: 0.6; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+
     .scene-problem {
+      text-align: center;
+      background: linear-gradient(180deg, #0a0502 0%, #050302 100%);
+    }
+
+    .problem-text {
+      font-size: 56px;
+      line-height: 1.6;
+      max-width: 1000px;
       text-align: center;
     }
 
-    .scene-problem .problem-text {
-      font-size: 56px;
-      line-height: 1.4;
-      max-width: 1000px;
-    }
-
-    .scene-problem .problem-text .line {
+    .problem-text .line {
       display: block;
       opacity: 0;
-      animation: wipeReveal 0.8s ease forwards;
+      filter: blur(4px);
+      animation: textRevealBlur 1.2s ease forwards;
     }
 
-    .scene-problem .problem-text .line:nth-child(2) {
-      animation-delay: 0.3s;
-    }
+    .problem-text .line:nth-child(1) { animation-delay: 0.5s; }
+    .problem-text .line:nth-child(2) { animation-delay: 2.5s; }
+    .problem-text .line:nth-child(3) { animation-delay: 5s; }
 
-    .scene-problem .problem-text .line:nth-child(3) {
-      animation-delay: 0.6s;
-    }
-
-    /* Step 3: Clip-path wipe reveal for problem lines */
-    @keyframes wipeReveal {
-      from { clip-path: inset(0 100% 0 0); opacity: 1; }
-      to { clip-path: inset(0 0% 0 0); opacity: 1; }
+    @keyframes textRevealBlur {
+      from { opacity: 0; filter: blur(4px); transform: translateY(20px); }
+      to { opacity: 1; filter: blur(0); transform: translateY(0); }
     }
 
     .fade-out {
@@ -384,11 +353,11 @@
       }
     }
 
-    /* Scene 3: Core Feature (8-18s) */
-    .scene-feature {
+    .scene-solution {
       flex-direction: row;
       padding: 0 120px;
       gap: 80px;
+      background: linear-gradient(180deg, #0a0502 0%, #150a05 100%);
     }
 
     .phone-mockup {
@@ -403,6 +372,8 @@
       overflow: hidden;
       position: relative;
       animation: phoneFloat 3s ease-in-out infinite;
+      opacity: 0;
+      animation: fadeInScale 1s ease forwards, phoneFloat 3s ease-in-out infinite 1s;
     }
 
     @keyframes phoneFloat {
@@ -490,7 +461,6 @@
       position: relative;
     }
 
-    /* Step 5: Record button radiating light waves */
     .record-button::before {
       content: '';
       position: absolute;
@@ -511,16 +481,6 @@
       pointer-events: none;
     }
 
-    @keyframes recordWave {
-      0% { inset: -10px; opacity: 0.6; }
-      100% { inset: -40px; opacity: 0; }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); box-shadow: 0 20px 60px rgba(255, 78, 0, 0.4); }
-      50% { transform: scale(1.02); box-shadow: 0 25px 70px rgba(255, 78, 0, 0.6); }
-    }
-
     .record-button svg {
       width: 50px;
       height: 50px;
@@ -534,29 +494,28 @@
       letter-spacing: 0.15em;
     }
 
-    .feature-description {
+    .solution-content {
       max-width: 500px;
     }
 
-    .feature-description h2 {
+    .solution-content h2 {
       font-size: 48px;
       margin-bottom: 24px;
       line-height: 1.2;
     }
 
-    /* Step 3: Feature title words fade from left with blur-to-sharp */
-    .feature-description h2 .word {
+    .solution-content h2 .word {
       display: inline-block;
       opacity: 0;
-      animation: wordFadeLeft 0.6s ease forwards;
+      animation: textRevealLeft 0.6s ease forwards;
     }
 
-    @keyframes wordFadeLeft {
+    @keyframes textRevealLeft {
       from { opacity: 0; transform: translateX(-30px); filter: blur(6px); }
       to { opacity: 1; transform: translateX(0); filter: blur(0); }
     }
 
-    .feature-description p {
+    .solution-content p {
       font-size: 20px;
       line-height: 1.8;
       color: rgba(255, 255, 255, 0.7);
@@ -579,34 +538,34 @@
       letter-spacing: 0.1em;
     }
 
-    /* Scene 4: AI Analysis (18-28s) */
-    .scene-analysis {
+    .scene-flow {
       padding: 0 120px;
+      background: linear-gradient(180deg, #150a05 0%, #1a0f0a 100%);
     }
 
-    .analysis-header {
+    .flow-header {
       text-align: center;
       margin-bottom: 60px;
     }
 
-    .analysis-header h2 {
+    .flow-header h2 {
       font-size: 56px;
       margin-bottom: 16px;
     }
 
-    .analysis-header p {
+    .flow-header p {
       font-size: 20px;
       color: rgba(255, 255, 255, 0.6);
     }
 
-    .analysis-flow {
+    .flow-cards {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 40px;
     }
 
-    .analysis-card {
+    .flow-card {
       width: 320px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -617,15 +576,15 @@
       transform: translateY(30px);
     }
 
-    .analysis-card.visible {
+    .flow-card.visible {
       animation: cardAppear 0.6s ease forwards;
     }
 
-    .analysis-card:nth-child(3).visible {
+    .flow-card:nth-child(3).visible {
       animation-delay: 0.3s;
     }
 
-    .analysis-card:nth-child(5).visible {
+    .flow-card:nth-child(5).visible {
       animation-delay: 0.6s;
     }
 
@@ -636,21 +595,7 @@
       }
     }
 
-    /* Step 3: Typewriter effect for analysis card descriptions */
-    .analysis-card p.typewriter {
-      overflow: hidden;
-      white-space: nowrap;
-      border-right: 2px solid var(--dream-accent);
-      width: 0;
-      animation: typewriterExpand 1.5s steps(30) 0.4s forwards;
-    }
-
-    @keyframes typewriterExpand {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-
-    .analysis-card .icon {
+    .flow-card .icon {
       width: 64px;
       height: 64px;
       margin: 0 auto 20px;
@@ -661,19 +606,19 @@
       justify-content: center;
     }
 
-    .analysis-card .icon svg {
+    .flow-card .icon svg {
       width: 32px;
       height: 32px;
       color: var(--dream-accent);
     }
 
-    .analysis-card h3 {
+    .flow-card h3 {
       font-size: 20px;
       margin-bottom: 12px;
       font-weight: 500;
     }
 
-    .analysis-card p {
+    .flow-card p {
       font-size: 14px;
       color: rgba(255, 255, 255, 0.6);
       line-height: 1.6;
@@ -696,11 +641,11 @@
       to { opacity: 1; }
     }
 
-    /* Scene 5: Personal Archive (28-38s) */
     .scene-archive {
       flex-direction: row;
       padding: 0 120px;
       gap: 100px;
+      background: linear-gradient(180deg, #1a0f0a 0%, #201510 100%);
     }
 
     .archive-content {
@@ -778,6 +723,16 @@
       border-radius: 16px;
       padding: 20px;
       margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .dream-card.visible {
+      animation: cardAppear 0.5s ease forwards;
+    }
+
+    .dream-card:nth-child(2).visible {
+      animation-delay: 0.3s;
     }
 
     .dream-card-header {
@@ -813,9 +768,33 @@
       letter-spacing: 0.05em;
     }
 
-    /* Scene 6: Global (38-50s) */
+    .scene-connection {
+      text-align: center;
+      background: linear-gradient(180deg, #201510 0%, #251a12 100%);
+    }
+
+    .connection-text {
+      font-size: 40px;
+      line-height: 1.6;
+      max-width: 800px;
+      margin-bottom: 40px;
+    }
+
+    .connection-text .highlight {
+      color: var(--dream-accent);
+      font-weight: 500;
+    }
+
+    .connection-subtext {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.6);
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 1.5s;
+    }
+
     .scene-global {
       text-align: center;
+      background: linear-gradient(180deg, #251a12 0%, #0a0502 100%);
     }
 
     .scene-global h2 {
@@ -849,7 +828,6 @@
       text-shadow: 0 0 60px rgba(255, 78, 0, 0.5);
     }
 
-    /* Step 5 & Step 3: Glow pulse on counter complete */
     .global-stat-number.glow-complete {
       animation: statGlowPulse 1.5s ease-in-out infinite;
     }
@@ -879,7 +857,6 @@
       height: 100%;
     }
 
-    /* Step 6: Map glow behind */
     .world-map::before {
       content: '';
       position: absolute;
@@ -902,114 +879,25 @@
       animation: pulseDot 2s ease-in-out infinite;
     }
 
-    @keyframes pulseDot {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-        box-shadow: 0 0 0 0 rgba(255, 78, 0, 0.7);
-      }
-      50% {
-        transform: scale(1.2);
-        opacity: 0.8;
-        box-shadow: 0 0 0 20px rgba(255, 78, 0, 0);
-      }
-    }
-
-    /* Step 6: Connection line animation */
     .connection-line {
       stroke-dasharray: 300;
       stroke-dashoffset: 300;
       animation: drawLine 3s ease-in-out infinite;
     }
 
-    @keyframes drawLine {
-      0% { stroke-dashoffset: 300; opacity: 0; }
-      20% { opacity: 0.6; }
-      80% { opacity: 0.6; }
-      100% { stroke-dashoffset: 0; opacity: 0; }
-    }
-
-    /* Scene 7: Multi-platform (50-58s) */
-    .scene-platform {
-      text-align: center;
-    }
-
-    .scene-platform h2 {
-      font-size: 56px;
-      margin-bottom: 60px;
-    }
-
-    .devices-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      gap: 60px;
-      margin-bottom: 60px;
-    }
-
-    .device {
-      text-align: center;
-    }
-
-    .device-icon {
-      width: 120px;
-      height: 120px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      transition: all 0.3s ease;
-    }
-
-    .device:hover .device-icon {
-      background: rgba(255, 78, 0, 0.1);
-      border-color: rgba(255, 78, 0, 0.3);
-      transform: translateY(-10px);
-    }
-
-    .device-icon svg {
-      width: 48px;
-      height: 48px;
-      color: rgba(255, 255, 255, 0.8);
-    }
-
-    .device:hover .device-icon svg {
-      color: var(--dream-accent);
-    }
-
-    .device-name {
-      font-size: 16px;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .device-status {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .platform-tagline {
-      font-size: 24px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    /* Scene 8: CTA (58-65s) */
     .scene-cta {
       text-align: center;
+      background: linear-gradient(180deg, #0a0502 0%, #150a05 100%);
     }
 
-    .scene-cta .cta-text {
+    .cta-text {
       font-family: var(--font-serif);
       font-style: italic;
       font-size: 72px;
       margin-bottom: 60px;
     }
 
-    /* Step 3: Each word fades in with upward float */
-    .scene-cta .cta-text .word {
+    .cta-text .word {
       display: inline-block;
       opacity: 0;
       animation: wordFloatUp 0.8s ease forwards;
@@ -1042,7 +930,6 @@
       position: relative;
     }
 
-    /* Step 5: CTA button ambient glow */
     .cta-button::before {
       content: '';
       position: absolute;
@@ -1076,36 +963,6 @@
       background: rgba(255, 255, 255, 0.05);
     }
 
-    /* Scene 9: Ending (65-70s) */
-    .scene-ending {
-      text-align: center;
-    }
-
-    .scene-ending .moon-icon {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 40px;
-    }
-
-    .scene-ending .moon-icon::after {
-      width: 100px;
-      height: 100px;
-      animation: moonGlowRing 3s ease-in-out infinite;
-    }
-
-    .scene-ending h1 {
-      font-size: 64px;
-      margin-bottom: 20px;
-    }
-
-    .scene-ending .tagline {
-      font-size: 18px;
-      color: rgba(255, 255, 255, 0.5);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-    }
-
-    /* Step 5: Accent elements glow */
     .accent-text {
       text-shadow: 0 0 20px rgba(255, 78, 0, 0.3);
     }
@@ -1118,7 +975,6 @@
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.03);
     }
 
-    /* Progress Bar */
     .progress-bar {
       position: absolute;
       bottom: 0;
@@ -1130,7 +986,6 @@
       z-index: 95;
     }
 
-    /* Audio Control */
     .audio-control {
       position: absolute;
       top: 40px;
@@ -1170,7 +1025,6 @@
       color: rgba(255, 255, 255, 0.7);
     }
 
-    /* Recording Controls */
     .recording-controls {
       position: absolute;
       bottom: 40px;
@@ -1184,6 +1038,11 @@
       border-radius: 100px;
       backdrop-filter: blur(10px);
       transition: opacity 0.5s ease;
+      opacity: 0;
+    }
+
+    .recording-controls.visible {
+      opacity: 1;
     }
 
     .recording-controls button {
@@ -1210,7 +1069,6 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
-    /* Step 7: Hide controls during playback */
     .playing .recording-controls {
       opacity: 0;
     }
@@ -1220,21 +1078,63 @@
     }
 
     .playing .audio-control {
-      opacity: 0;
-    }
+        opacity: 0;
+      }
 
-    .playing:hover .audio-control {
-      opacity: 0.5;
-    }
+      .playing:hover .audio-control {
+        opacity: 0.5;
+      }
 
-    /* Hidden video element for recording */
-    #recorded-video {
-      display: none;
-    }
-  </style>
+      .start-prompt {
+        position: absolute;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 101;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      .start-prompt.visible {
+        opacity: 1;
+      }
+
+      .start-prompt p {
+        font-size: 24px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 16px;
+        font-family: 'Cormorant Garamond', serif;
+        font-style: italic;
+      }
+
+      .start-prompt .arrow {
+        display: inline-block;
+        font-size: 32px;
+        color: var(--dream-accent);
+        animation: bounce 0.5s ease infinite alternate;
+      }
+
+      @keyframes bounce {
+        from { transform: translateY(0); }
+        to { transform: translateY(10px); }
+      }
+
+      .playing .start-prompt {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .video-container {
+        cursor: pointer;
+      }
+
+      #recorded-video {
+        display: none;
+      }
+    </style>
 </head>
 <body>
-  <!-- Step 4: SVG filter for film grain -->
   <svg style="position:absolute;width:0;height:0;">
     <filter id="grainFilter">
       <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
@@ -1243,18 +1143,14 @@
   </svg>
 
   <div class="video-container" id="videoContainer">
-    <!-- Step 1: Particle Canvas -->
     <canvas id="particleCanvas"></canvas>
 
     <div class="atmosphere"></div>
 
-    <!-- Step 4: Vignette -->
     <div class="vignette"></div>
 
-    <!-- Step 4: Film Grain -->
     <div class="film-grain"></div>
 
-    <!-- Audio Control -->
     <div class="audio-control">
       <span class="audio-label">BGM: episode33</span>
       <button id="muteBtn" title="Toggle Mute">
@@ -1265,7 +1161,11 @@
       </button>
     </div>
 
-    <!-- Recording Controls -->
+    <div class="start-prompt" id="startPrompt">
+      <p>Click anywhere or press Play to begin</p>
+      <span class="arrow">↓</span>
+    </div>
+
     <div class="recording-controls">
       <button id="playBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -1290,39 +1190,15 @@
       </button>
     </div>
 
-    <!-- Scene 1: Opening (0-3s) -->
-    <div class="scene scene-opening active" data-duration="3000">
-      <div class="logo-container">
-        <div class="moon-icon">
-          <svg viewBox="0 0 100 100" fill="none">
-            <path d="M70 15 A45 45 0 1 1 30 85 A35 35 0 1 0 70 15" fill="white" filter="url(#glow)"/>
-            <defs>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-          </svg>
-        </div>
-        <h1 class="title-serif text-gradient" id="thothTitle">Thoth</h1>
-        <p class="subtitle">AI Dream Archive</p>
-      </div>
-    </div>
-
-    <!-- Scene 2: Problem (3-8s) -->
-    <div class="scene scene-problem" data-duration="5000">
+    <div class="scene scene-problem active" data-duration="10000">
       <div class="problem-text title-serif">
-        <span class="line">梦境正在消失...</span>
-        <span class="line">每晚，我们失去 95% 的梦境记忆</span>
-        <span class="line">那些来自潜意识的信息，永远沉入虚空</span>
+        <span class="line">Last night, you had a dream...</span>
+        <span class="line">But now, you've forgotten it.</span>
+        <span class="line">95% of dreams vanish the moment we wake</span>
       </div>
     </div>
 
-    <!-- Scene 3: Core Feature (8-18s) -->
-    <div class="scene scene-feature" data-duration="10000">
+    <div class="scene scene-solution" data-duration="10000">
       <div class="phone-mockup">
         <div class="phone-screen">
           <div class="phone-header">
@@ -1345,9 +1221,9 @@
           <div class="type-button">Type Dream</div>
         </div>
       </div>
-      <div class="feature-description">
-        <h2 class="title-serif" id="featureTitle">在清醒的瞬间<br>捕捉<span class="accent-text">梦境</span></h2>
-        <p>3分钟倒计时机制利用损失厌恶心理，将遗忘的痛苦转化为记录的动力。语音转录技术让你在半梦半醒间，轻松保存潜意识的信息。</p>
+      <div class="solution-content">
+        <h2 class="title-serif" id="solutionTitle">Capture the whisper of your <span class="accent-text">subconscious</span></h2>
+        <p>A 3-minute countdown turns the pain of forgetting into motivation to record. Voice transcription lets you capture your subconscious mind in those fleeting moments between sleep and waking.</p>
         <div class="feature-tags">
           <span class="feature-tag">Voice Recording</span>
           <span class="feature-tag">AI Transcription</span>
@@ -1356,30 +1232,29 @@
       </div>
     </div>
 
-    <!-- Scene 4: AI Analysis (18-28s) -->
-    <div class="scene scene-analysis" data-duration="10000">
-      <div class="analysis-header">
-        <h2 class="title-serif">AI 解码你的<span class="accent-text">潜意识</span></h2>
-        <p>每一个梦境，都是通往内心深处的钥匙</p>
+    <div class="scene scene-flow" data-duration="10000">
+      <div class="flow-header">
+        <h2 class="title-serif">For the first time, your <span class="accent-text">subconscious speaks</span></h2>
+        <p>Every dream is a key to your inner world</p>
       </div>
-      <div class="analysis-flow">
-        <div class="analysis-card" id="card1">
+      <div class="flow-cards">
+        <div class="flow-card" id="flowCard1">
           <div class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
             </svg>
           </div>
-          <h3>语音录入</h3>
-          <p class="typewriter">在半梦半醒间，用声音记录梦境的每一个细节</p>
+          <h3>Voice</h3>
+          <p>Record your dream in those fleeting moments between sleep and waking</p>
         </div>
-        <div class="arrow" id="arrow1">
+        <div class="arrow" id="flowArrow1">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
         </div>
-        <div class="analysis-card" id="card2">
+        <div class="flow-card" id="flowCard2">
           <div class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -1387,16 +1262,16 @@
               <line x1="12" y1="22.08" x2="12" y2="12"></line>
             </svg>
           </div>
-          <h3>符号提取</h3>
-          <p class="typewriter">AI 自动识别梦境中的原子符号与关键词</p>
+          <h3>Symbol</h3>
+          <p>AI identifies atomic symbols and keywords in your dream</p>
         </div>
-        <div class="arrow" id="arrow2">
+        <div class="arrow" id="flowArrow2">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
           </svg>
         </div>
-        <div class="analysis-card" id="card3">
+        <div class="flow-card" id="flowCard3">
           <div class="icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
@@ -1404,17 +1279,16 @@
               <line x1="12" y1="8" x2="12.01" y2="8"></line>
             </svg>
           </div>
-          <h3>神谕句子</h3>
-          <p class="typewriter">获得 AI 生成的神秘洞察，揭示潜意识的讯息</p>
+          <h3>Oracle</h3>
+          <p>Receive mystical insights generated by AI, revealing your subconscious message</p>
         </div>
       </div>
     </div>
 
-    <!-- Scene 5: Personal Archive (28-38s) -->
     <div class="scene scene-archive" data-duration="10000">
       <div class="archive-content">
-        <h2 class="title-serif">你的私人<br><span class="accent-text">梦境图书馆</span></h2>
-        <p>所有梦境都被安全保存在云端，随时回顾、搜索、聆听原始录音。AI 自动提取的标签构建起属于你的梦境图谱。</p>
+        <h2 class="title-serif">Your private <span class="accent-text">dream library</span></h2>
+        <p>All dreams are safely stored in the cloud, ready for you to review, search, and listen to original recordings. AI-extracted tags build your personal dream atlas.</p>
         <div class="archive-stats">
           <div class="stat-item">
             <div class="stat-number">∞</div>
@@ -1435,7 +1309,7 @@
           <h3>The Archive</h3>
           <p>Your Personal Subconscious Library</p>
         </div>
-        <div class="dream-card">
+        <div class="dream-card" id="dreamCard1">
           <div class="dream-card-header">
             <span>May 17, 2026</span>
             <span>Unknown</span>
@@ -1447,7 +1321,7 @@
             <span class="dream-tag">#sunset</span>
           </div>
         </div>
-        <div class="dream-card">
+        <div class="dream-card" id="dreamCard2">
           <div class="dream-card-header">
             <span>May 16, 2026</span>
             <span>Tokyo</span>
@@ -1462,10 +1336,17 @@
       </div>
     </div>
 
-    <!-- Scene 6: Global (38-50s) -->
-    <div class="scene scene-global" data-duration="12000">
-      <h2 class="title-serif">连接<span class="accent-text">集体潜意识</span></h2>
-      <p class="subtitle">Synthesized Patterns from the Global Subconscious</p>
+    <div class="scene scene-connection" data-duration="8000">
+      <div class="connection-text title-serif">
+        Someone in <span class="highlight">Tokyo</span> dreamed of flying<br>
+        Just like you did last night.
+      </div>
+      <p class="connection-subtext">You are not alone.</p>
+    </div>
+
+    <div class="scene scene-global" data-duration="10000">
+      <h2 class="title-serif">Mapping the <span class="accent-text">collective unconscious</span></h2>
+      <p class="subtitle">Patterns emerging from the global dream network</p>
       <div class="global-stats-container">
         <div class="global-stat">
           <div class="global-stat-number" id="dreamerCount">0</div>
@@ -1477,43 +1358,29 @@
         </div>
       </div>
       <div class="world-map">
-        <!-- Step 6: Proper simplified world map SVG -->
         <svg viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- North America -->
           <path d="M120 80 L140 70 L180 65 L210 70 L230 80 L240 100 L250 120 L240 140 L230 155 L220 170 L200 180 L180 190 L160 195 L140 190 L120 180 L110 160 L100 140 L95 120 L100 100 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- South America -->
           <path d="M190 210 L210 200 L230 210 L240 230 L245 260 L240 290 L230 310 L215 330 L200 345 L185 340 L175 320 L170 300 L165 280 L168 260 L175 240 L180 225 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- Europe -->
           <path d="M370 70 L390 65 L410 68 L425 75 L430 85 L425 95 L415 100 L400 105 L385 108 L370 105 L360 95 L355 85 L360 75 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- Africa -->
           <path d="M380 130 L400 120 L420 125 L440 135 L450 155 L455 180 L450 210 L445 240 L435 265 L420 285 L405 295 L390 290 L375 275 L365 250 L360 225 L358 200 L360 175 L365 155 L370 140 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- Asia -->
           <path d="M440 60 L480 50 L520 55 L560 60 L600 65 L630 75 L650 90 L660 110 L655 130 L640 145 L620 155 L590 160 L560 165 L530 160 L500 150 L475 140 L455 125 L445 110 L440 90 L438 75 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- India -->
           <path d="M530 170 L545 165 L560 175 L565 195 L555 215 L540 225 L525 218 L520 200 L522 185 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- Southeast Asia / Indonesia -->
           <path d="M600 180 L620 175 L640 180 L660 185 L670 195 L660 205 L640 210 L620 208 L605 200 L598 190 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- Australia -->
           <path d="M620 260 L650 250 L680 255 L700 265 L710 280 L705 300 L690 315 L665 320 L640 315 L625 305 L618 290 L615 275 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- Japan -->
           <path d="M660 80 L668 75 L675 82 L672 95 L665 105 L658 100 L655 90 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- UK -->
           <path d="M365 68 L370 62 L375 68 L373 78 L367 80 L363 75 Z" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" fill="rgba(255,255,255,0.03)"/>
-          <!-- Grid lines -->
           <line x1="0" y1="100" x2="800" y2="100" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
           <line x1="0" y1="200" x2="800" y2="200" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
           <line x1="0" y1="300" x2="800" y2="300" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
           <line x1="200" y1="0" x2="200" y2="400" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
           <line x1="400" y1="0" x2="400" y2="400" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
           <line x1="600" y1="0" x2="600" y2="400" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-          <!-- Step 6: Animated connection lines -->
           <path class="connection-line" d="M170 130 Q300 100 395 90" stroke="rgba(255,78,0,0.4)" stroke-width="1" fill="none" style="animation-delay: 0s;"/>
           <path class="connection-line" d="M395 90 Q500 80 580 100" stroke="rgba(255,78,0,0.4)" stroke-width="1" fill="none" style="animation-delay: 1s;"/>
           <path class="connection-line" d="M580 100 Q620 140 635 190" stroke="rgba(255,78,0,0.4)" stroke-width="1" fill="none" style="animation-delay: 2s;"/>
           <path class="connection-line" d="M400 200 Q500 220 660 280" stroke="rgba(255,78,0,0.4)" stroke-width="1" fill="none" style="animation-delay: 0.5s;"/>
           <path class="connection-line" d="M200 260 Q300 240 380 200" stroke="rgba(255,78,0,0.4)" stroke-width="1" fill="none" style="animation-delay: 1.5s;"/>
         </svg>
-        <!-- Step 6: 18 pulse dots distributed across continents -->
         <div class="pulse-dot" style="top: 22%; left: 18%;"></div>
         <div class="pulse-dot" style="top: 28%; left: 22%; animation-delay: 0.3s;"></div>
         <div class="pulse-dot" style="top: 35%; left: 15%; animation-delay: 0.7s;"></div>
@@ -1535,101 +1402,24 @@
       </div>
     </div>
 
-    <!-- Scene 7: Multi-platform (50-58s) -->
-    <div class="scene scene-platform" data-duration="8000">
-      <h2 class="title-serif">随时随地，<span class="accent-text">记录梦境</span></h2>
-      <div class="devices-container">
-        <div class="device">
-          <div class="device-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-              <line x1="12" y1="18" x2="12.01" y2="18"></line>
-            </svg>
-          </div>
-          <div class="device-name">iOS</div>
-          <div class="device-status">App Store</div>
-        </div>
-        <div class="device">
-          <div class="device-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-              <line x1="12" y1="18" x2="12.01" y2="18"></line>
-            </svg>
-          </div>
-          <div class="device-name">Android</div>
-          <div class="device-status">Google Play</div>
-        </div>
-        <div class="device">
-          <div class="device-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 6v6l4 2"></path>
-            </svg>
-          </div>
-          <div class="device-name">WearOS</div>
-          <div class="device-status">Standalone App</div>
-        </div>
-        <div class="device">
-          <div class="device-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-              <line x1="8" y1="21" x2="16" y2="21"></line>
-              <line x1="12" y1="17" x2="12" y2="21"></line>
-            </svg>
-          </div>
-          <div class="device-name">Web</div>
-          <div class="device-status">thoth.app</div>
-        </div>
-      </div>
-      <p class="platform-tagline">跨平台同步，无缝体验</p>
-    </div>
-
-    <!-- Scene 8: CTA (58-65s) -->
-    <div class="scene scene-cta" data-duration="7000">
-      <h2 class="cta-text" id="ctaText">Your dreams matter.</h2>
+    <div class="scene scene-cta" data-duration="2000">
+      <h2 class="cta-text" id="ctaText">Your story is part of this picture.</h2>
       <div class="cta-buttons">
-        <button class="cta-button">立即开始</button>
-        <button class="cta-button secondary">了解更多</button>
+        <button class="cta-button">Start Now</button>
+        <button class="cta-button secondary">Learn More</button>
       </div>
     </div>
 
-    <!-- Scene 9: Ending (65-70s) -->
-    <div class="scene scene-ending" data-duration="5000">
-      <div class="moon-icon">
-        <svg viewBox="0 0 100 100" fill="none">
-          <path d="M70 15 A45 45 0 1 1 30 85 A35 35 0 1 0 70 15" fill="white" filter="url(#glow2)"/>
-          <defs>
-            <filter id="glow2">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-        </svg>
-      </div>
-      <h1 class="title-serif text-gradient">Thoth</h1>
-      <p class="tagline">AI Dream Archive</p>
-    </div>
-
-    <!-- Progress Bar -->
     <div class="progress-bar" id="progressBar"></div>
 
-    <!-- Hidden Video Element -->
     <video id="recorded-video" controls></video>
   </div>
 
-  <!-- Background Music -->
   <audio id="bgMusic" loop>
-    <!-- Placeholder for episode33 audio file -->
     <source src="assets/audio/episode33.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    // ==========================================
-    // Step 1: Canvas Star Field Particle System
-    // ==========================================
     (function initParticleSystem() {
       const canvas = document.getElementById('particleCanvas');
       const ctx = canvas.getContext('2d');
@@ -1639,7 +1429,6 @@
       const W = canvas.width;
       const H = canvas.height;
 
-      // Layer 1: Far stars - 200 tiny white dots
       const farStars = [];
       for (let i = 0; i < 200; i++) {
         farStars.push({
@@ -1654,7 +1443,6 @@
         });
       }
 
-      // Layer 2: Mid particles - 50 warm orange embers
       const midParticles = [];
       for (let i = 0; i < 50; i++) {
         midParticles.push({
@@ -1670,7 +1458,6 @@
         });
       }
 
-      // Layer 3: Near bokeh - 15 large circles
       const nearBokeh = [];
       for (let i = 0; i < 15; i++) {
         nearBokeh.push({
@@ -1701,7 +1488,6 @@
         ctx.clearRect(0, 0, W, H);
         time += 0.016;
 
-        // Draw Layer 1: Far stars
         for (const s of farStars) {
           updateParticle(s);
           const twinkle = 0.5 + 0.5 * Math.sin(time * s.twinkleSpeed * 60 + s.twinklePhase);
@@ -1711,7 +1497,6 @@
           ctx.fill();
         }
 
-        // Draw Layer 2: Mid embers
         for (const p of midParticles) {
           updateParticle(p);
           ctx.beginPath();
@@ -1720,7 +1505,6 @@
           ctx.fill();
         }
 
-        // Draw Layer 3: Near bokeh
         for (const b of nearBokeh) {
           updateParticle(b);
           ctx.save();
@@ -1739,32 +1523,10 @@
       animate();
     })();
 
-    // ==========================================
-    // Step 3: Text Reveal Preparations
-    // ==========================================
-
-    // Scene 1: Split "Thoth" into letter spans
-    (function prepareThothTitle() {
-      const titleEl = document.getElementById('thothTitle');
-      if (!titleEl) return;
-      const text = titleEl.textContent;
-      titleEl.innerHTML = '';
-      for (let i = 0; i < text.length; i++) {
-        const span = document.createElement('span');
-        span.className = 'letter';
-        span.textContent = text[i] === ' ' ? '\u00A0' : text[i];
-        span.style.animationDelay = (i * 0.08) + 's';
-        titleEl.appendChild(span);
-      }
-    })();
-
-    // Scene 3: Split feature title into word spans
-    (function prepareFeatureTitle() {
-      const titleEl = document.getElementById('featureTitle');
+    (function prepareSolutionTitle() {
+      const titleEl = document.getElementById('solutionTitle');
       if (!titleEl) return;
       const html = titleEl.innerHTML;
-      // We need to preserve the <br> and <span> inside
-      // Process text nodes to wrap words
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = html;
 
@@ -1780,7 +1542,7 @@
               const span = document.createElement('span');
               span.className = 'word';
               span.textContent = word;
-              span.style.animationDelay = (wordIndex * 0.15) + 's';
+              span.style.animationDelay = (wordIndex * 0.08) + 's';
               fragment.appendChild(span);
               wordIndex++;
             }
@@ -1795,7 +1557,6 @@
       titleEl.innerHTML = tempDiv.innerHTML;
     })();
 
-    // Scene 8: Split CTA text into word spans
     (function prepareCTAText() {
       const ctaEl = document.getElementById('ctaText');
       if (!ctaEl) return;
@@ -1817,9 +1578,6 @@
       }
     })();
 
-    // ==========================================
-    // Scene Management
-    // ==========================================
     const scenes = document.querySelectorAll('.scene');
     const progressBar = document.getElementById('progressBar');
     const videoContainer = document.getElementById('videoContainer');
@@ -1827,13 +1585,10 @@
     let isPlaying = false;
     let animationId = null;
     let sceneStartTime = 0;
-    let totalDuration = 75000; // 75 seconds total
+    let totalDuration = 60000;
 
-    // Scene durations in milliseconds
-    const sceneDurations = [3000, 5000, 10000, 10000, 10000, 12000, 8000, 7000, 5000];
+    const sceneDurations = [10000, 10000, 10000, 10000, 8000, 10000, 2000];
 
-    // Step 2: Transition definitions per scene change
-    // transitionMap[fromScene][toScene] = { exit: 'className', enter: 'className', duration: ms }
     const transitionMap = {
       0: { exit: 'exit-fade-zoom', enter: 'enter-fade-zoom', duration: 800 },
       1: { exit: 'exit-blur-dissolve', enter: 'enter-blur-dissolve', duration: 800 },
@@ -1841,23 +1596,19 @@
       3: { exit: 'exit-slide-up', enter: 'enter-slide-up', duration: 800 },
       4: { exit: 'exit-circle-wipe', enter: 'enter-circle-wipe', duration: 800 },
       5: { exit: 'exit-scale-fade', enter: 'enter-scale-fade', duration: 800 },
-      6: { exit: 'exit-fade-black', enter: 'enter-fade-black', duration: 800 },
-      7: { exit: 'exit-slow-dissolve', enter: 'enter-slow-dissolve', duration: 1200 }
+      6: { exit: 'exit-slow-dissolve', enter: 'enter-slow-dissolve', duration: 1200 }
     };
 
-    // Audio elements
     const bgMusic = document.getElementById('bgMusic');
     const muteBtn = document.getElementById('muteBtn');
     let isMuted = false;
 
-    // Recording elements
     const recordBtn = document.getElementById('recordBtn');
     const downloadBtn = document.getElementById('downloadBtn');
     const recordedVideo = document.getElementById('recorded-video');
     let mediaRecorder = null;
     let recordedChunks = [];
 
-    // Counter animation for global stats
     function animateCounter(element, target, duration) {
       duration = duration || 2000;
       let start = 0;
@@ -1867,7 +1618,6 @@
         if (start >= target) {
           element.textContent = target.toLocaleString();
           clearInterval(timer);
-          // Step 5: Add glow pulse when counter completes
           element.classList.add('glow-complete');
         } else {
           element.textContent = Math.floor(start).toLocaleString();
@@ -1875,13 +1625,11 @@
       }, 16);
     }
 
-    // Step 2: Enhanced showScene with transitions
     let transitionInProgress = false;
 
     function showScene(index, prevIndex) {
       if (transitionInProgress) return;
 
-      // Determine transition type
       let transition = null;
       if (prevIndex !== undefined && transitionMap[prevIndex]) {
         transition = transitionMap[prevIndex];
@@ -1892,67 +1640,64 @@
         const oldScene = scenes[prevIndex];
         const newScene = scenes[index];
 
-        // Apply exit animation to old scene
         oldScene.classList.remove('active');
         oldScene.classList.add(transition.exit);
 
-        // Apply enter animation to new scene
         newScene.classList.add(transition.enter);
 
-        // After a short delay, make new scene active
         setTimeout(function() {
           newScene.classList.add('active');
         }, 50);
 
-        // Clean up after transition completes
         setTimeout(function() {
           oldScene.classList.remove(transition.exit);
           newScene.classList.remove(transition.enter);
           transitionInProgress = false;
         }, transition.duration);
       } else {
-        // Simple fade (for initial scene or fallback)
         scenes.forEach(function(scene, i) {
           scene.classList.toggle('active', i === index);
         });
       }
 
-      // Trigger scene-specific animations
-      if (index === 3) { // AI Analysis scene
+      if (index === 2) {
         setTimeout(function() {
-          document.getElementById('card1').classList.add('visible');
-          document.getElementById('arrow1').classList.add('visible');
+          document.getElementById('flowCard1').classList.add('visible');
+          document.getElementById('flowArrow1').classList.add('visible');
         }, 500);
         setTimeout(function() {
-          document.getElementById('card2').classList.add('visible');
-          document.getElementById('arrow2').classList.add('visible');
+          document.getElementById('flowCard2').classList.add('visible');
+          document.getElementById('flowArrow2').classList.add('visible');
         }, 1500);
         setTimeout(function() {
-          document.getElementById('card3').classList.add('visible');
+          document.getElementById('flowCard3').classList.add('visible');
         }, 2500);
       }
 
-      if (index === 5) { // Global scene
-        // Reset glow classes
+      if (index === 3) {
+        setTimeout(function() {
+          document.getElementById('dreamCard1').classList.add('visible');
+          document.getElementById('dreamCard2').classList.add('visible');
+        }, 500);
+      }
+
+      if (index === 5) {
         document.getElementById('dreamerCount').classList.remove('glow-complete');
         document.getElementById('dreamCount').classList.remove('glow-complete');
 
         setTimeout(function() {
-          animateCounter(document.getElementById('dreamerCount'), 1234, 2000);
-          animateCounter(document.getElementById('dreamCount'), 5678, 2500);
+          animateCounter(document.getElementById('dreamerCount'), 12345, 2000);
+          animateCounter(document.getElementById('dreamCount'), 67890, 2500);
         }, 500);
       }
     }
 
-    // Play video
     function playVideo() {
       if (isPlaying) return;
       isPlaying = true;
 
-      // Step 7: Add playing class
       videoContainer.classList.add('playing');
 
-      // Start background music
       if (bgMusic && !isMuted) {
         bgMusic.play().catch(function(e) { console.log('Audio play failed:', e); });
       }
@@ -1967,20 +1712,16 @@
         const elapsed = currentTime - sceneStartTime;
         const currentSceneDuration = sceneDurations[currentScene];
 
-        // Update progress bar
         const totalElapsed = sceneDurations.slice(0, currentScene).reduce(function(a, b) { return a + b; }, 0) + elapsed;
         const progress = (totalElapsed / totalDuration) * 100;
         progressBar.style.width = progress + '%';
 
-        // Check if scene should change
         if (elapsed >= currentSceneDuration) {
           var prevScene = currentScene;
           currentScene++;
           if (currentScene >= scenes.length) {
-            // Video ended
             isPlaying = false;
             progressBar.style.width = '100%';
-            // Step 7: Remove playing class
             videoContainer.classList.remove('playing');
             if (mediaRecorder && mediaRecorder.state === 'recording') {
               mediaRecorder.stop();
@@ -1997,10 +1738,8 @@
       animationId = requestAnimationFrame(update);
     }
 
-    // Stop video
     function stopVideo() {
       isPlaying = false;
-      // Step 7: Remove playing class
       videoContainer.classList.remove('playing');
       if (animationId) {
         cancelAnimationFrame(animationId);
@@ -2011,7 +1750,6 @@
       }
     }
 
-    // Mute toggle
     muteBtn.addEventListener('click', function() {
       isMuted = !isMuted;
       if (bgMusic) {
@@ -2029,7 +1767,6 @@
         '</svg>';
     });
 
-    // Recording functionality
     async function startRecording() {
       try {
         const stream = await navigator.mediaDevices.getDisplayMedia({
@@ -2074,7 +1811,6 @@
           ' Stop Recording';
         recordBtn.classList.remove('secondary');
 
-        // Auto-start playback when recording starts
         playVideo();
 
       } catch (err) {
@@ -2096,8 +1832,8 @@
       }
     }
 
-    // Button event listeners
-    document.getElementById('playBtn').addEventListener('click', function() {
+    document.getElementById('playBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
       if (isPlaying) {
         stopVideo();
         document.getElementById('playBtn').innerHTML =
@@ -2116,7 +1852,23 @@
       }
     });
 
-    recordBtn.addEventListener('click', function() {
+    videoContainer.addEventListener('click', function(e) {
+      // 忽略点击按钮
+      if (e.target.closest('button')) return;
+      
+      if (!isPlaying) {
+        playVideo();
+        document.getElementById('playBtn').innerHTML =
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">' +
+            '<rect x="6" y="4" width="4" height="16"></rect>' +
+            '<rect x="14" y="4" width="4" height="16"></rect>' +
+          '</svg>' +
+          ' Stop';
+      }
+    });
+
+    recordBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
       if (mediaRecorder && mediaRecorder.state === 'recording') {
         stopRecording();
       } else {
@@ -2124,11 +1876,13 @@
       }
     });
 
-    // Initialize first scene
-    showScene(0);
+    // 5秒后显示提示和控制按钮
+    setTimeout(function() {
+      document.getElementById('startPrompt').classList.add('visible');
+      document.querySelector('.recording-controls').classList.add('visible');
+    }, 5000);
 
-    // Auto-start on load (optional)
-    // setTimeout(playVideo, 1000);
+    showScene(0);
   </script>
 </body>
 </html>
